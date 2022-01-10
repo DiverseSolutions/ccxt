@@ -10,7 +10,7 @@ npm-debug.log
 config.js
 config.py
 config.php
-ccxt.egg-info/
+ccxt.egg-info
 tmp/
 *.pyc
 .tox/
@@ -32,3 +32,6 @@ python/keys.json
 python/LICENSE.txt
 .env
 *.swp
+
+t.js
+t.py

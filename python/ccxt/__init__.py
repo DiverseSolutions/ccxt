@@ -22,7 +22,7 @@
 
 # ----------------------------------------------------------------------------
 
-__version__ = '1.66.32'
+__version__ = '0.0.2'
 
 # ----------------------------------------------------------------------------
 
@@ -117,6 +117,7 @@ from ccxt.coinbasepro import coinbasepro                    # noqa: F401
 from ccxt.coincheck import coincheck                        # noqa: F401
 from ccxt.coinex import coinex                              # noqa: F401
 from ccxt.coinfalcon import coinfalcon                      # noqa: F401
+from ccxt.coinhub import coinhub                            # noqa: F401
 from ccxt.coinmate import coinmate                          # noqa: F401
 from ccxt.coinone import coinone                            # noqa: F401
 from ccxt.coinspot import coinspot                          # noqa: F401
@@ -234,6 +235,7 @@ exchanges = [
     'coincheck',
     'coinex',
     'coinfalcon',
+    'coinhub',
     'coinmate',
     'coinone',
     'coinspot',
