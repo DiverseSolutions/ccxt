@@ -4,7 +4,6 @@
 # https://github.com/ccxt/ccxt/blob/master/CONTRIBUTING.md#how-to-contribute-code
 
 from ccxt.async_support.base.exchange import Exchange
-import sys
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import DDoSProtection
 
@@ -125,18 +124,7 @@ class dax(Exchange):
 
     async def fetch_tickers(self, symbols=None, params={}):
         await self.load_markets()
-        request = {
-            'operationName': 'Pairs',
-            'variables': {
-                'sysPairWhere': {
-                    'is_active': {
-                        '_eq': True,
-                    },
-                },
-            },
-            'query': 'query Pairs($sysPairWhere: sys_pair_bool_exp) {\n  sys_pair(where: $sysPairWhere) {\n    id\n    baseAsset {\n      code\n      name\n      scale\n      total_market_cap\n      __typename\n    }\n    price {\n      last_price\n      __typename\n    }\n    quoteAsset {\n      code\n      name\n      scale\n      __typename\n    }\n    symbol\n    is_active\n    stats24 {\n      change24h\n      __typename\n    }\n    base_tick_size\n    quote_tick_size\n    __typename\n  }\n  ex_pair_stats_24h {\n    b24h_price\n    change24h\n    symbol\n    pair_id\n    last_price\n    updated_dt\n    vol\n    __typename\n  }\n}\n',
-        }
-        response = await self.publicGetPairStats(self.json(self.extend(request, params)))
+        response = await self.publicGetPairStats(params)
         # [
         #     {
         #         "type": "Crypto",
@@ -159,7 +147,7 @@ class dax(Exchange):
         return self.parse_tickers(response, symbols)
 
     def parse_ticker(self, ticker, market=None):
-        timestamp = self.safe_timestamp(ticker['updatedDate'])
+        timestamp = self.safe_timestamp(ticker, 'updatedDate')
         # {
         #     "type": "Crypto",
         #     "last_price": 183.0000000000000000,

@@ -6,7 +6,6 @@
 from ccxt.async_support.base.exchange import Exchange
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import NotSupported
-from ccxt.base.errors import DDoSProtection
 
 
 class trademn(Exchange):
@@ -37,7 +36,7 @@ class trademn(Exchange):
                 'fetchOrder': False,
                 'fetchOrderBook': False,
                 'fetchOrders': False,
-                'fetchTicker': False,
+                'fetchTicker': True,
                 'fetchTickers': True,
                 'fetchTrades': False,
                 'fetchWithdrawals': False,
@@ -191,7 +190,7 @@ class trademn(Exchange):
         keys = list(markets.keys())
         for i in range(0, len(keys)):
             marketId = markets[keys[i]]['id']
-            ticker = await self.fetch_ticker(marketId); 
+            ticker = await self.fetch_ticker(marketId)
             result.append(ticker)
         return self.filter_by_array(result, 'symbol', symbols)
 
@@ -255,8 +254,6 @@ class trademn(Exchange):
         return {'url': url, 'method': method, 'body': body, 'headers': headers}
 
     def handle_errors(self, code, reason, url, method, headers, body, response, requestHeaders, requestBody):
-        if code == 503:
-            raise DDoSProtection(self.id + ' ' + str(code) + ' ' + reason + ' ' + body)
         if response is None:
             return  # fallback to default error handler
         if 'code' in response:

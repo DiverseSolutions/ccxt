@@ -135,7 +135,7 @@ module.exports = class coinhub extends Exchange {
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
-        await this.loadMarkets ()
+        await this.loadMarkets ();
         const response = await this.publicGetTickers (params);
         // {
         //     "code": 200,

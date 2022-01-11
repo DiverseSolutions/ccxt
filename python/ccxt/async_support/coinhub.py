@@ -132,6 +132,7 @@ class coinhub(Exchange):
         return result
 
     async def fetch_tickers(self, symbols=None, params={}):
+        await self.load_markets()
         response = await self.publicGetTickers(params)
         # {
         #     "code": 200,
@@ -149,8 +150,7 @@ class coinhub(Exchange):
         #             "market": "IHC/MNT"
         #         },
         # }
-        tickers = self.parse_tickers(response['data'], symbols)
-        return self.filter_by_array(tickers, 'symbol', symbols)
+        return self.parse_tickers(response['data'], symbols)
 
     def parse_ticker(self, ticker, market=None):
         timestamp = self.safe_integer(ticker, 'timestamp')
@@ -169,7 +169,7 @@ class coinhub(Exchange):
         #         }
         #     }
         # }
-        marketId = self.safe_string(ticker, 'symbol')
+        marketId = self.safe_string(ticker, 'market')
         symbol = self.safe_symbol(marketId, market)
         # if marketId in self.markets_by_id:
         #     market = self.markets_by_id[marketId]

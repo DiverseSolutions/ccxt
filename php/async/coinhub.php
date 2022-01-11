@@ -138,6 +138,7 @@ class coinhub extends Exchange {
     }
 
     public function fetch_tickers($symbols = null, $params = array ()) {
+        yield $this->load_markets();
         $response = yield $this->publicGetTickers ($params);
         // {
         //     "code" => 200,
@@ -155,8 +156,7 @@ class coinhub extends Exchange {
         //             "market" => "IHC/MNT"
         //         ),
         // }
-        $tickers = $this->parse_tickers($response['data'], $symbols);
-        return $this->filter_by_array($tickers, 'symbol', $symbols);
+        return $this->parse_tickers($response['data'], $symbols);
     }
 
     public function parse_ticker($ticker, $market = null) {
@@ -176,7 +176,7 @@ class coinhub extends Exchange {
         //         }
         //     }
         // }
-        $marketId = $this->safe_string($ticker, 'symbol');
+        $marketId = $this->safe_string($ticker, 'market');
         $symbol = $this->safe_symbol($marketId, $market);
         // if (is_array($this->markets_by_id) && array_key_exists($marketId, $this->markets_by_id)) {
         //     $market = $this->markets_by_id[$marketId];

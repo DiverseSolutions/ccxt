@@ -3,7 +3,7 @@
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, DDoSProtectionm, NotSupported } = require ('./base/errors');
+const { ExchangeError, NotSupported } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ module.exports = class trademn extends Exchange {
         if (!ticker) {
             throw new NotSupported (market['id'] + ' not supported');
         }
-        ticker['minMax'] = response['minMax']
+        ticker['minMax'] = response['minMax'];
         return this.parseTicker (ticker, market);
     }
 
@@ -195,7 +195,7 @@ module.exports = class trademn extends Exchange {
         const keys = Object.keys (markets);
         for (let i = 0; i < keys.length; i++) {
             const marketId = markets[keys[i]]['id'];
-            const ticker = await this.fetchTicker (marketId); 
+            const ticker = await this.fetchTicker (marketId);
             result.push (ticker);
         }
         return this.filterByArray (result, 'symbol', symbols);
@@ -264,9 +264,6 @@ module.exports = class trademn extends Exchange {
     }
 
     handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
-        if (code === 503) {
-            throw new DDoSProtection (this.id + ' ' + code.toString () + ' ' + reason + ' ' + body);
-        }
         if (response === undefined) {
             return; // fallback to default error handler
         }

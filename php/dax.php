@@ -128,18 +128,7 @@ class dax extends Exchange {
 
     public function fetch_tickers($symbols = null, $params = array ()) {
         $this->load_markets();
-        $request = array(
-            'operationName' => 'Pairs',
-            'variables' => array(
-                'sysPairWhere' => array(
-                    'is_active' => array(
-                        '_eq' => true,
-                    ),
-                ),
-            ),
-            'query' => 'query Pairs($sysPairWhere => sys_pair_bool_exp) array(\n  sys_pair(where => $sysPairWhere) array(\n    id\n    baseAsset array(\n      code\n      name\n      scale\n      total_market_cap\n      __typename\n    )\n    price array(\n      last_price\n      __typename\n    )\n    quoteAsset array(\n      code\n      name\n      scale\n      __typename\n    )\n    symbol\n    is_active\n    stats24 array(\n      change24h\n      __typename\n    )\n    base_tick_size\n    quote_tick_size\n    __typename\n  )\n  ex_pair_stats_24h array(\n    b24h_price\n    change24h\n    symbol\n    pair_id\n    last_price\n    updated_dt\n    vol\n    __typename\n  )\n)\n',
-        );
-        $response = $this->publicGetPairStats ($this->json(array_merge($request, $params)));
+        $response = $this->publicGetPairStats ($params);
         // array(
         //     {
         //         "type" => "Crypto",
@@ -163,7 +152,7 @@ class dax extends Exchange {
     }
 
     public function parse_ticker($ticker, $market = null) {
-        $timestamp = $this->safe_timestamp($ticker['updatedDate']);
+        $timestamp = $this->safe_timestamp($ticker, 'updatedDate');
         // {
         //     "type" => "Crypto",
         //     "last_price" => 183.0000000000000000,

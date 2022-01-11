@@ -8,7 +8,6 @@ namespace ccxt;
 use Exception; // a common import
 use \ccxt\ExchangeError;
 use \ccxt\NotSupported;
-use \ccxt\DDoSProtection;
 
 class trademn extends Exchange {
 
@@ -38,7 +37,7 @@ class trademn extends Exchange {
                 'fetchOrder' => false,
                 'fetchOrderBook' => false,
                 'fetchOrders' => false,
-                'fetchTicker' => false,
+                'fetchTicker' => true,
                 'fetchTickers' => true,
                 'fetchTrades' => false,
                 'fetchWithdrawals' => false,
@@ -189,7 +188,7 @@ class trademn extends Exchange {
         if (!$ticker) {
             throw new NotSupported($market['id'] . ' not supported');
         }
-        $ticker['minMax'] = $response['minMax']
+        $ticker['minMax'] = $response['minMax'];
         return $this->parse_ticker($ticker, $market);
     }
 
@@ -199,7 +198,7 @@ class trademn extends Exchange {
         $keys = is_array($markets) ? array_keys($markets) : array();
         for ($i = 0; $i < count($keys); $i++) {
             $marketId = $markets[$keys[$i]]['id'];
-            $ticker = $this->fetch_ticker($marketId); 
+            $ticker = $this->fetch_ticker($marketId);
             $result[] = $ticker;
         }
         return $this->filter_by_array($result, 'symbol', $symbols);
@@ -268,9 +267,6 @@ class trademn extends Exchange {
     }
 
     public function handle_errors($code, $reason, $url, $method, $headers, $body, $response, $requestHeaders, $requestBody) {
-        if ($code === 503) {
-            throw new DDoSProtection($this->id . ' ' . (string) $code . ' ' . $reason . ' ' . $body);
-        }
         if ($response === null) {
             return; // fallback to default error handler
         }
