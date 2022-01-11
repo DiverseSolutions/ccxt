@@ -169,6 +169,7 @@ class Exchange {
         'tidebit',
         'tidex',
         'timex',
+        'trademn',
         'upbit',
         'vcc',
         'wavesexchange',

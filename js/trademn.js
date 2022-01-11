@@ -3,7 +3,7 @@
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, DDoSProtection } = require ('./base/errors');
+const { ExchangeError, DDoSProtectionm, NotSupported } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -34,34 +34,24 @@ module.exports = class trademn extends Exchange {
                 'fetchOrder': false,
                 'fetchOrderBook': false,
                 'fetchOrders': false,
-                'fetchTicker': false,
+                'fetchTicker': true,
                 'fetchTickers': true,
                 'fetchTrades': false,
                 'fetchWithdrawals': false,
                 'withdraw': undefined,
             },
             'urls': {
-                'test': {
-                    'market': 'https://sapi.trademn.mn/v1',
-                    'public': 'https://sapi.trademn.mn/v1',
-                },
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
-                    'market': 'https://sapi.trademn.mn/v1/market',
-                    'public': 'https://sapi.trademn.mn/v1',
+                    'public': 'https://trade.mn:116/api/v2',
                 },
-                'www': 'https://www.byte-trade.com',
-                'doc': 'https://docs.byte-trade.com/#description',
+                'www': 'https://trade.mn',
+                'doc': 'https://trade.mn',
             },
             'api': {
-                'market': {
-                    'get': [
-                        'tickers',
-                    ],
-                },
                 'public': {
                     'get': [
-                        'tickers',
+                        'exchange/checkpair',
                     ],
                 },
             },
@@ -69,15 +59,34 @@ module.exports = class trademn extends Exchange {
     }
 
     async fetchMarkets (params = {}) {
-        const response = await this.publicGetTickers (params);
-        const markets = response['data'];
+        const response = await this.publicGetExchangeCheckpair (params);
+        // {
+        //     "status": true,
+        //     "code": "100/1",
+        //     "pairName": [
+        //         {
+        //             "name": "TRD/MNT",
+        //             "id": 323,
+        //             "code": "TRD",
+        //             "fromCurrencyId": "203",
+        //             "toCurrencyId": "1",
+        //             "lastPrice": 1.11,
+        //             "isFiat": "1",
+        //             "nameC": "Digital Exchange Coin",
+        //             "price24H": "1.14",
+        //             "diff": "-0.89",
+        //             "createDate": "2021-08-18 10:50:54.0"
+        //         }
+        //     ],
+        // }
+        const markets = response['pairName'];
         const result = [];
-        const keys = Object.keys (markets);
-        for (let i = 0; i < keys.length; i++) {
-            const market = markets[keys[i]];
-            const id = this.safeString (market, 'market');
-            let base = this.safeString (market, 'market').split ('/')[0].toUpperCase ();
-            let quote = this.safeString (market, 'market').split ('/')[1].toUpperCase ();
+        for (let i = 0; i < markets.length; i++) {
+            const market = markets[i];
+            const id = this.safeString (market, 'name');
+            const symbols = id.split ('/');
+            let base = symbols[0].toUpperCase ();
+            let quote = symbols[1].toUpperCase ();
             const baseId = base;
             const quoteId = quote;
             if (baseId in this.commonCurrencies) {
@@ -134,80 +143,113 @@ module.exports = class trademn extends Exchange {
         return result;
     }
 
-    async fetchTickers (symbols = undefined, params = {}) {
-        const response = await this.publicGetTickers (params);
+    async fetchTicker (symbol, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+        };
+        const response = await this.publicGetExchangeCheckpair (this.extend (request, params));
         // {
-        //     "code": 200,
-        //     "message": "success",
-        //     "data": {
-        //         "IHC/MNT": {
-        //             "volume": 1595147755.9,
-        //             "high": 3.23997,
-        //             "deal": 5117109795.941351,
-        //             "close": 3.224,
-        //             "low": 3.13,
-        //             "open": 3.16003,
-        //             "change": 0.0202,
-        //             "timestamp": 1641522240004,
-        //             "market": "IHC/MNT"
-        //         },
+        //     "status": true,
+        //     "code": "100/1",
+        //     "pairName": [
+        //         {
+        //             "name": "TRD/MNT",
+        //             "id": 323,
+        //             "code": "TRD",
+        //             "fromCurrencyId": "203",
+        //             "toCurrencyId": "1",
+        //             "lastPrice": 1.11,
+        //             "isFiat": "1",
+        //             "nameC": "Digital Exchange Coin",
+        //             "price24H": "1.14",
+        //             "diff": "-0.89",
+        //             "createDate": "2021-08-18 10:50:54.0"
+        //         }
+        //     ],
+        //     "minMax": [
+        //         {
+        //             "currencyId": "100",
+        //             "max24": 122000000,
+        //             "min24": 118008000,
+        //             "toCurrencyId": "1",
+        //             "minTradePrice": 0.0001,
+        //             "q": 0.48042547000000013,
+        //             "p": 58001875.40842133
+        //         }
+        //     ]
         // }
-        return this.parseTickers (response['data'], symbols);
+        const foundTickers = this.filterByArray (response['pairName'], 'name', market['id']);
+        const ticker = foundTickers[market['id']];
+        if (!ticker) {
+            throw new NotSupported (market['id'] + ' not supported');
+        }
+        ticker['minMax'] = response['minMax']
+        return this.parseTicker (ticker, market);
+    }
+
+    async fetchTickers (symbols = undefined, params = {}) {
+        const markets = await this.loadMarkets ();
+        const result = [];
+        const keys = Object.keys (markets);
+        for (let i = 0; i < keys.length; i++) {
+            const marketId = markets[keys[i]]['id'];
+            const ticker = await this.fetchTicker (marketId); 
+            result.push (ticker);
+        }
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTicker (ticker, market = undefined) {
-        const timestamp = this.safeInteger (ticker, 'timestamp');
+        const timestamp = undefined;
         // {
-        //     "data": {
-        //         "IHC/MNT": {
-        //             "volume": 1595147755.9,
-        //             "high": 3.23997,
-        //             "deal": 5117109795.941351,
-        //             "close": 3.224,
-        //             "low": 3.13,
-        //             "open": 3.16003,
-        //             "change": 0.0202,
-        //             "timestamp": 1641522240004,
-        //             "market": "IHC/MNT"
+        //     "name": "TRD/MNT",
+        //     "id": 323,
+        //     "code": "TRD",
+        //     "fromCurrencyId": "203",
+        //     "toCurrencyId": "1",
+        //     "lastPrice": 1.11,
+        //     "isFiat": "1",
+        //     "nameC": "Digital Exchange Coin",
+        //     "price24H": "1.14",
+        //     "diff": "-0.89",
+        //     "createDate": "2021-08-18 10:50:54.0",
+        //     "minMax": [
+        //         {
+        //             "currencyId": "100",
+        //             "max24": 122000000,
+        //             "min24": 118008000,
+        //             "toCurrencyId": "1",
+        //             "minTradePrice": 0.0001,
+        //             "q": 0.48042547000000013,
+        //             "p": 58001875.40842133
         //         }
-        //     }
+        //     ]
         // }
         const marketId = this.safeString (ticker, 'symbol');
         const symbol = this.safeSymbol (marketId, market);
-        // if (marketId in this.markets_by_id) {
-        //     market = this.markets_by_id[marketId];
-        // } else {
-        //     const baseId = this.safeString (ticker, 'base');
-        //     const quoteId = this.safeString (ticker, 'quote');
-        //     if ((baseId !== undefined) && (quoteId !== undefined)) {
-        //         const base = this.safeCurrencyCode (baseId);
-        //         const quote = this.safeCurrencyCode (quoteId);
-        //         symbol = base + '/' + quote;
-        //     }
-        // }
-        // if ((symbol === undefined) && (market !== undefined)) {
-        //     symbol = market['symbol'];
-        // }
+        const stats = ticker['minMax'][0];
         return {
             'symbol': symbol,
             'timestamp': timestamp,
-            'datetime': this.iso8601 (timestamp),
-            'high': this.safeNumber (ticker, 'high'),
-            'low': this.safeNumber (ticker, 'low'),
+            'datetime': undefined,
+            'high': this.safeNumber (stats, 'max24'),
+            'low': this.safeNumber (stats, 'min24'),
             'bid': undefined,
             'bidVolume': undefined,
             'ask': undefined,
             'askVolume': undefined,
             'vwap': undefined,
-            'open': this.safeNumber (ticker, 'open'),
-            'close': this.safeNumber (ticker, 'close'),
-            'last': this.safeNumber (ticker, 'close'),
+            'open': undefined,
+            'close': this.safeNumber (ticker, 'lastPrice'),
+            'last': this.safeNumber (ticker, 'lastPrice'),
             'previousClose': undefined,
-            'change': this.safeNumber (ticker, 'change'),
+            'change': undefined,
             'percentage': undefined,
             'average': undefined,
-            'baseVolume': this.safeNumber (ticker, 'volume'),
-            'quoteVolume': undefined,
+            'baseVolume': this.safeNumber (stats, 'q'),
+            'quoteVolume': this.safeNumber (stats, 'p'),
             'info': ticker,
         };
     }

@@ -176,6 +176,7 @@ from ccxt.therock import therock                            # noqa: F401
 from ccxt.tidebit import tidebit                            # noqa: F401
 from ccxt.tidex import tidex                                # noqa: F401
 from ccxt.timex import timex                                # noqa: F401
+from ccxt.trademn import trademn                            # noqa: F401
 from ccxt.upbit import upbit                                # noqa: F401
 from ccxt.vcc import vcc                                    # noqa: F401
 from ccxt.wavesexchange import wavesexchange                # noqa: F401
@@ -295,6 +296,7 @@ exchanges = [
     'tidebit',
     'tidex',
     'timex',
+    'trademn',
     'upbit',
     'vcc',
     'wavesexchange',

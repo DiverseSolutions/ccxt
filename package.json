@@ -594,7 +594,9 @@
     "KuCoin Futures",
     "coinhub",
     "dax.mn",
-    "dax"
+    "dax",
+    "trade.mn",
+    "trademn"
   ],
   "collective": {
     "type": "opencollective",
