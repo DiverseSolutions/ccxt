@@ -173,7 +173,7 @@ module.exports = class coinhub extends Exchange {
         //         }
         //     }
         // }
-        const marketId = this.safeString (ticker, 'symbol');
+        const marketId = this.safeString (ticker, 'market');
         const symbol = this.safeSymbol (marketId, market);
         // if (marketId in this.markets_by_id) {
         //     market = this.markets_by_id[marketId];
