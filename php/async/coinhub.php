@@ -175,7 +175,8 @@ class coinhub extends Exchange {
         //         }
         //     }
         // }
-        $marketId = $this->safe_string($ticker, 'market');
+        $marketId = $this->safe_string($ticker, 'symbol');
+        $symbol = $this->safe_symbol($marketId, $market);
         // if (is_array($this->markets_by_id) && array_key_exists($marketId, $this->markets_by_id)) {
         //     $market = $this->markets_by_id[$marketId];
         // } else {
@@ -184,14 +185,14 @@ class coinhub extends Exchange {
         //     if (($baseId !== null) && ($quoteId !== null)) {
         //         $base = $this->safe_currency_code($baseId);
         //         $quote = $this->safe_currency_code($quoteId);
-        //         symbol = $base . '/' . $quote;
+        //         $symbol = $base . '/' . $quote;
         //     }
         // }
-        // if ((symbol === null) && ($market !== null)) {
-        //     symbol = $market['symbol'];
+        // if (($symbol === null) && ($market !== null)) {
+        //     $symbol = $market['symbol'];
         // }
         return array(
-            'symbol' => $marketId,
+            'symbol' => $symbol,
             'timestamp' => $timestamp,
             'datetime' => $this->iso8601($timestamp),
             'high' => $this->safe_number($ticker, 'high'),

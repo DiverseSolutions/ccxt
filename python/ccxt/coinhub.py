@@ -168,7 +168,8 @@ class coinhub(Exchange):
         #         }
         #     }
         # }
-        marketId = self.safe_string(ticker, 'market')
+        marketId = self.safe_string(ticker, 'symbol')
+        symbol = self.safe_symbol(marketId, market)
         # if marketId in self.markets_by_id:
         #     market = self.markets_by_id[marketId]
         # else:
@@ -184,7 +185,7 @@ class coinhub(Exchange):
         #     symbol = market['symbol']
         # }
         return {
-            'symbol': marketId,
+            'symbol': symbol,
             'timestamp': timestamp,
             'datetime': self.iso8601(timestamp),
             'high': self.safe_number(ticker, 'high'),
