@@ -597,7 +597,11 @@
     "dax",
     "trade.mn",
     "trademn",
-    "corex"
+    "corex",
+    "complex.mn",
+    "c",
+    "corex.mn",
+    "complex"
   ],
   "collective": {
     "type": "opencollective",

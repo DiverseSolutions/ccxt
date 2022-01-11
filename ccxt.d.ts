@@ -477,6 +477,7 @@ declare module 'ccxt' {
     export class coinmate extends Exchange {}
     export class coinone extends Exchange {}
     export class coinspot extends Exchange {}
+    export class complex extends Exchange {}
     export class corex extends Exchange {}
     export class crex24 extends Exchange {}
     export class cryptocom extends Exchange {}
@@ -600,6 +601,7 @@ declare module 'ccxt' {
         | 'coinmate'
         | 'coinone'
         | 'coinspot'
+        | 'complex'
         | 'corex'
         | 'crex24'
         | 'cryptocom'
