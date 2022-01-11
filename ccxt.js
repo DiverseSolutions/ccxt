@@ -36,7 +36,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '0.0.2'
+const version = '0.0.1'
 
 Exchange.ccxtVersion = version
 
@@ -98,6 +98,7 @@ const exchanges = {
     'crex24':                  require ('./js/crex24.js'),
     'cryptocom':               require ('./js/cryptocom.js'),
     'currencycom':             require ('./js/currencycom.js'),
+    'dax':                     require ('./js/dax.js'),
     'delta':                   require ('./js/delta.js'),
     'deribit':                 require ('./js/deribit.js'),
     'digifinex':               require ('./js/digifinex.js'),

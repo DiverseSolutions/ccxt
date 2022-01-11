@@ -4,7 +4,7 @@
 
 # -----------------------------------------------------------------------------
 
-__version__ = '0.0.2'
+__version__ = '0.0.1'
 
 # -----------------------------------------------------------------------------
 
@@ -106,6 +106,7 @@ from ccxt.async_support.coinspot import coinspot                          # noqa
 from ccxt.async_support.crex24 import crex24                              # noqa: F401
 from ccxt.async_support.cryptocom import cryptocom                        # noqa: F401
 from ccxt.async_support.currencycom import currencycom                    # noqa: F401
+from ccxt.async_support.dax import dax                                    # noqa: F401
 from ccxt.async_support.delta import delta                                # noqa: F401
 from ccxt.async_support.deribit import deribit                            # noqa: F401
 from ccxt.async_support.digifinex import digifinex                        # noqa: F401
@@ -224,6 +225,7 @@ exchanges = [
     'crex24',
     'cryptocom',
     'currencycom',
+    'dax',
     'delta',
     'deribit',
     'digifinex',

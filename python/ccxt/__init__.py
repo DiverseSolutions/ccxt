@@ -22,7 +22,7 @@
 
 # ----------------------------------------------------------------------------
 
-__version__ = '0.0.2'
+__version__ = '0.0.1'
 
 # ----------------------------------------------------------------------------
 
@@ -124,6 +124,7 @@ from ccxt.coinspot import coinspot                          # noqa: F401
 from ccxt.crex24 import crex24                              # noqa: F401
 from ccxt.cryptocom import cryptocom                        # noqa: F401
 from ccxt.currencycom import currencycom                    # noqa: F401
+from ccxt.dax import dax                                    # noqa: F401
 from ccxt.delta import delta                                # noqa: F401
 from ccxt.deribit import deribit                            # noqa: F401
 from ccxt.digifinex import digifinex                        # noqa: F401
@@ -242,6 +243,7 @@ exchanges = [
     'crex24',
     'cryptocom',
     'currencycom',
+    'dax',
     'delta',
     'deribit',
     'digifinex',

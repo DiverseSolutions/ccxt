@@ -36,7 +36,7 @@ use Elliptic\EdDSA;
 use BN\BN;
 use Exception;
 
-$version = '0.0.2';
+$version = '0.0.1';
 
 // rounding mode
 const TRUNCATE = 0;
@@ -55,7 +55,7 @@ const PAD_WITH_ZERO = 1;
 
 class Exchange {
 
-    const VERSION = '0.0.2';
+    const VERSION = '0.0.1';
 
     private static $base58_alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
     private static $base58_encoder = null;
@@ -117,6 +117,7 @@ class Exchange {
         'crex24',
         'cryptocom',
         'currencycom',
+        'dax',
         'delta',
         'deribit',
         'digifinex',
