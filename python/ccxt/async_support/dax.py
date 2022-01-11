@@ -4,7 +4,6 @@
 # https://github.com/ccxt/ccxt/blob/master/CONTRIBUTING.md#how-to-contribute-code
 
 from ccxt.async_support.base.exchange import Exchange
-import math
 import sys
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import DDoSProtection
@@ -45,13 +44,9 @@ class dax(Exchange):
                 'withdraw': None,
             },
             'urls': {
-                'test': {
-                    'public': 'https://api.dax.mn/v1',
-                    'tv': 'https://pairstats.dax.mn/tv',
-                },
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
-                    'public': 'https://api.dax.mn/v1',
+                    'public': 'https://pairstats.dax.mn',
                     'tv': 'https://pairstats.dax.mn/tv',
                 },
                 'www': 'https://dax.mn',
@@ -59,8 +54,8 @@ class dax(Exchange):
             },
             'api': {
                 'public': {
-                    'post': [
-                        'graphql',
+                    'get': [
+                        'pair-stats',
                     ],
                 },
                 'tv': {
@@ -141,109 +136,68 @@ class dax(Exchange):
             },
             'query': 'query Pairs($sysPairWhere: sys_pair_bool_exp) {\n  sys_pair(where: $sysPairWhere) {\n    id\n    baseAsset {\n      code\n      name\n      scale\n      total_market_cap\n      __typename\n    }\n    price {\n      last_price\n      __typename\n    }\n    quoteAsset {\n      code\n      name\n      scale\n      __typename\n    }\n    symbol\n    is_active\n    stats24 {\n      change24h\n      __typename\n    }\n    base_tick_size\n    quote_tick_size\n    __typename\n  }\n  ex_pair_stats_24h {\n    b24h_price\n    change24h\n    symbol\n    pair_id\n    last_price\n    updated_dt\n    vol\n    __typename\n  }\n}\n',
         }
-        response = await self.publicPostGraphql(self.json(self.extend(request, params)))
-        # {
-        #     "data": {
-        #         "sys_pair": [
-        #             {
-        #                 "id": 23,
-        #                 "baseAsset": {
-        #                     "code": "MONT",
-        #                     "name": "MONT",
-        #                     "scale": 18,
-        #                     "total_market_cap": null,
-        #                     "__typename": "sys_asset"
-        #                 },
-        #                 "price": {
-        #                     "last_price": 99,
-        #                     "__typename": "ex_pair_price"
-        #                 },
-        #                 "quoteAsset": {
-        #                     "code": "MNT",
-        #                     "name": "Төгрөг",
-        #                     "scale": 2,
-        #                     "__typename": "sys_asset"
-        #                 },
-        #                 "symbol": "MONTMNT",
-        #                 "is_active": True,
-        #                 "stats24": {
-        #                     "change24h": 0.00000000,
-        #                     "__typename": "ex_pair_stats_24h"
-        #                 },
-        #                 "base_tick_size": 1000000000000000000,
-        #                 "quote_tick_size": 1,
-        #                 "__typename": "sys_pair"
-        #             },
-        #         ],
-        #         "ex_pair_stats_24h": [
-        #             {
-        #                 "b24h_price": null,
-        #                 "change24h": 0.00000000,
-        #                 "symbol": "14MNT",
-        #                 "pair_id": 9,
-        #                 "last_price": null,
-        #                 "updated_dt": "2021-01-29T01:20:20",
-        #                 "vol": null,
-        #                 "__typename": "ex_pair_stats_24h"
-        #             },
-        #         ]
+        response = await self.publicGetPairStats(self.json(self.extend(request, params)))
+        # [
+        #     {
+        #         "type": "Crypto",
+        #         "last_price": 183.0000000000000000,
+        #         "trading_pairs": "ARDXURG",
+        #         "lowest_ask": 182.0000000000000000,
+        #         "highest_bid": 170.0000000000000000,
+        #         "price_change_percent_24h": 4.57142857,
+        #         "baseSymbol": "ARDX",
+        #         "highest_price_24h": 183.0000000000000000,
+        #         "lowest_price_24h": 172.9900000000000000,
+        #         "quoteSymbol": "URG",
+        #         "base_volume": 18897.700000000000,
+        #         "quote_volume": 3289530.999000000000,
+        #         "updatedDate": "2022-01-11T21:12:14",
+        #         "trades": 10
         #     }
-        # }
+        # ]
         # merge volume from ex_pair_stats_24h
-        for i in range(0, len(response['data']['sys_pair'])):
-            pair = response['data']['sys_pair'][i]
-            pair['vol'] = 0
-            for j in range(0, len(response['data']['ex_pair_stats_24h'])):
-                pairStats = response['data']['ex_pair_stats_24h'][j]
-                if pair['symbol'] == pairStats['symbol'] and pairStats['vol']:
-                    pair['vol'] = pairStats['vol']
-        return self.parse_tickers(response['data']['sys_pair'], symbols)
+        return self.parse_tickers(response, symbols)
 
     def parse_ticker(self, ticker, market=None):
-        timestamp = None
+        timestamp = self.safe_timestamp(ticker['updatedDate'])
         # {
-        #     id: '24',
-        #     baseAsset: {
-        #       code: 'URG',
-        #       name: 'URG',
-        #       scale: '18',
-        #       total_market_cap: null,
-        #       __typename: 'sys_asset'
-        #     },
-        #     price: {last_price: '540000000000000000', __typename: 'ex_pair_price'},
-        #     quoteAsset: {code: 'MONT', name: 'MONT', scale: '18', __typename: 'sys_asset'},
-        #     symbol: 'URGMONT',
-        #     is_active: True,
-        #     stats24: {change24h: '20.00000000', __typename: 'ex_pair_stats_24h'},
-        #     base_tick_size: '10000000000000000',
-        #     quote_tick_size: '10000000000000000',
-        #     __typename: 'sys_pair'
+        #     "type": "Crypto",
+        #     "last_price": 183.0000000000000000,
+        #     "trading_pairs": "ARDXURG",
+        #     "lowest_ask": 182.0000000000000000,
+        #     "highest_bid": 170.0000000000000000,
+        #     "price_change_percent_24h": 4.57142857,
+        #     "baseSymbol": "ARDX",
+        #     "highest_price_24h": 183.0000000000000000,
+        #     "lowest_price_24h": 172.9900000000000000,
+        #     "quoteSymbol": "URG",
+        #     "base_volume": 18897.700000000000,
+        #     "quote_volume": 3289530.999000000000,
+        #     "updatedDate": "2022-01-11T21:12:14",
+        #     "trades": 10
         # }
-        marketId = self.safe_string(ticker, 'symbol')
+        marketId = self.safe_string(ticker, 'trading_pairs')
         symbol = self.safe_symbol(marketId, market)
-        baseScale = self.safe_number(ticker['baseAsset'], 'scale')
-        quoteScale = self.safe_number(ticker['quoteAsset'], 'scale')
-        price = self.safe_number(ticker['price'], 'last_price') / math.pow(10, quoteScale)
         return {
             'symbol': symbol,
             'timestamp': timestamp,
-            'datetime': None,
-            'high': None,
-            'low': None,
-            'bid': None,
+            'datetime': ticker['updatedDate'],
+            'high': ticker['highest_price_24h'],
+            'low': ticker['lowest_price_24h'],
+            'bid': ticker['highest_bid'],
             'bidVolume': None,
-            'ask': None,
+            'ask': ticker['lowest_ask'],
             'askVolume': None,
             'vwap': None,
             'open': None,
-            'close': price,
-            'last': price,
+            'close': ticker['last_price'],
+            'last': ticker['last_price'],
             'previousClose': None,
             'change': None,
             'percentage': None,
             'average': None,
-            'baseVolume': self.safe_number(ticker, 'vol') / math.pow(10, baseScale),
-            'quoteVolume': None,
+            'baseVolume': ticker['base_volume'],
+            'quoteVolume': ticker['quote_volume'],
             'info': ticker,
         }
 
