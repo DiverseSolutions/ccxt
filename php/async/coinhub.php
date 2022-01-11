@@ -155,7 +155,8 @@ class coinhub extends Exchange {
         //             "market" => "IHC/MNT"
         //         ),
         // }
-        return $this->parse_tickers($response['data'], $symbols);
+        $tickers = $this->parse_tickers($response['data'], $symbols);
+        return $this->filter_by_array($tickers, 'symbol', $symbols);
     }
 
     public function parse_ticker($ticker, $market = null) {

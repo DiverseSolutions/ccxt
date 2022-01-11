@@ -149,7 +149,8 @@ class coinhub(Exchange):
         #             "market": "IHC/MNT"
         #         },
         # }
-        return self.parse_tickers(response['data'], symbols)
+        tickers = self.parse_tickers(response['data'], symbols)
+        return self.filter_by_array(tickers, 'symbol', symbols)
 
     def parse_ticker(self, ticker, market=None):
         timestamp = self.safe_integer(ticker, 'timestamp')
