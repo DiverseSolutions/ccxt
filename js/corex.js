@@ -46,8 +46,8 @@ module.exports = class corex extends Exchange {
                     'public': 'https://www.corex.mn/api/v2/peatio/public',
                     'market': 'http://52.79.140.119:8000/corex',
                 },
-                'www': 'https://dax.mn',
-                'doc': 'https://dax.mn',
+                'www': 'https://www.corex.mn',
+                'doc': 'https://www.corex.mn',
             },
             'api': {
                 'public': {
