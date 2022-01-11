@@ -473,12 +473,16 @@ declare module 'ccxt' {
     export class coincheck extends Exchange {}
     export class coinex extends Exchange {}
     export class coinfalcon extends Exchange {}
+    export class coinhub extends Exchange {}
     export class coinmate extends Exchange {}
     export class coinone extends Exchange {}
     export class coinspot extends Exchange {}
+    export class complex extends Exchange {}
+    export class corex extends Exchange {}
     export class crex24 extends Exchange {}
     export class cryptocom extends Exchange {}
     export class currencycom extends Exchange {}
+    export class dax extends Exchange {}
     export class delta extends Exchange {}
     export class deribit extends Exchange {}
     export class digifinex extends Exchange {}
@@ -530,6 +534,7 @@ declare module 'ccxt' {
     export class tidebit extends Exchange {}
     export class tidex extends Exchange {}
     export class timex extends Exchange {}
+    export class trademn extends Exchange {}
     export class upbit extends Exchange {}
     export class vcc extends Exchange {}
     export class wavesexchange extends Exchange {}
@@ -592,12 +597,16 @@ declare module 'ccxt' {
         | 'coincheck'
         | 'coinex'
         | 'coinfalcon'
+        | 'coinhub'
         | 'coinmate'
         | 'coinone'
         | 'coinspot'
+        | 'complex'
+        | 'corex'
         | 'crex24'
         | 'cryptocom'
         | 'currencycom'
+        | 'dax'
         | 'delta'
         | 'deribit'
         | 'digifinex'
@@ -649,6 +658,7 @@ declare module 'ccxt' {
         | 'tidebit'
         | 'tidex'
         | 'timex'
+        | 'trademn'
         | 'upbit'
         | 'vcc'
         | 'wavesexchange'

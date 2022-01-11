@@ -4,7 +4,7 @@
 
 # -----------------------------------------------------------------------------
 
-__version__ = '1.66.32'
+__version__ = '0.0.1'
 
 # -----------------------------------------------------------------------------
 
@@ -99,12 +99,16 @@ from ccxt.async_support.coinbasepro import coinbasepro                    # noqa
 from ccxt.async_support.coincheck import coincheck                        # noqa: F401
 from ccxt.async_support.coinex import coinex                              # noqa: F401
 from ccxt.async_support.coinfalcon import coinfalcon                      # noqa: F401
+from ccxt.async_support.coinhub import coinhub                            # noqa: F401
 from ccxt.async_support.coinmate import coinmate                          # noqa: F401
 from ccxt.async_support.coinone import coinone                            # noqa: F401
 from ccxt.async_support.coinspot import coinspot                          # noqa: F401
+from ccxt.async_support.complex import complex                            # noqa: F401
+from ccxt.async_support.corex import corex                                # noqa: F401
 from ccxt.async_support.crex24 import crex24                              # noqa: F401
 from ccxt.async_support.cryptocom import cryptocom                        # noqa: F401
 from ccxt.async_support.currencycom import currencycom                    # noqa: F401
+from ccxt.async_support.dax import dax                                    # noqa: F401
 from ccxt.async_support.delta import delta                                # noqa: F401
 from ccxt.async_support.deribit import deribit                            # noqa: F401
 from ccxt.async_support.digifinex import digifinex                        # noqa: F401
@@ -156,6 +160,7 @@ from ccxt.async_support.therock import therock                            # noqa
 from ccxt.async_support.tidebit import tidebit                            # noqa: F401
 from ccxt.async_support.tidex import tidex                                # noqa: F401
 from ccxt.async_support.timex import timex                                # noqa: F401
+from ccxt.async_support.trademn import trademn                            # noqa: F401
 from ccxt.async_support.upbit import upbit                                # noqa: F401
 from ccxt.async_support.vcc import vcc                                    # noqa: F401
 from ccxt.async_support.wavesexchange import wavesexchange                # noqa: F401
@@ -216,12 +221,16 @@ exchanges = [
     'coincheck',
     'coinex',
     'coinfalcon',
+    'coinhub',
     'coinmate',
     'coinone',
     'coinspot',
+    'complex',
+    'corex',
     'crex24',
     'cryptocom',
     'currencycom',
+    'dax',
     'delta',
     'deribit',
     'digifinex',
@@ -273,6 +282,7 @@ exchanges = [
     'tidebit',
     'tidex',
     'timex',
+    'trademn',
     'upbit',
     'vcc',
     'wavesexchange',
