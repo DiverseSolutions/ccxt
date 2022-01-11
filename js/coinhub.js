@@ -135,6 +135,7 @@ module.exports = class coinhub extends Exchange {
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
+        await this.loadMarkets ()
         const response = await this.publicGetTickers (params);
         // {
         //     "code": 200,
@@ -152,8 +153,7 @@ module.exports = class coinhub extends Exchange {
         //             "market": "IHC/MNT"
         //         },
         // }
-        const tickers = this.parseTickers (response['data'], symbols);
-        return this.filterByArray (tickers, 'symbol', symbols);
+        return this.parseTickers (response['data'], symbols);
     }
 
     parseTicker (ticker, market = undefined) {
