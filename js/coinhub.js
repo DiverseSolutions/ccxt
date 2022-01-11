@@ -152,7 +152,8 @@ module.exports = class coinhub extends Exchange {
         //             "market": "IHC/MNT"
         //         },
         // }
-        return this.parseTickers (response['data'], symbols);
+        const tickers = this.parseTickers (response['data'], symbols);
+        return this.filterByArray (tickers, 'symbol', symbols);
     }
 
     parseTicker (ticker, market = undefined) {
