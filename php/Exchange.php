@@ -114,6 +114,7 @@ class Exchange {
         'coinmate',
         'coinone',
         'coinspot',
+        'corex',
         'crex24',
         'cryptocom',
         'currencycom',
