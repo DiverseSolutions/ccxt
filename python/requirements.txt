@@ -1,0 +1,19 @@
+aiodns==3.0.0
+aiohttp==3.8.1
+aioschedule==0.5.2
+aiosignal==1.2.0
+async-timeout==4.0.2
+attrs==21.4.0
+-e git+https://github.com/DiverseSolutions/ccxt.git@3e2ac072e9b64a7cee3c4508efff519a9ea59500#egg=ccxt&subdirectory=python
+certifi==2021.10.8
+cffi==1.15.0
+charset-normalizer==2.0.10
+cryptography==36.0.1
+frozenlist==1.2.0
+idna==3.3
+multidict==5.2.0
+pycares==4.1.2
+pycparser==2.21
+requests==2.27.1
+urllib3==1.26.8
+yarl==1.7.2
