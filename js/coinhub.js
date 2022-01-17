@@ -204,7 +204,7 @@ module.exports = class coinhub extends Exchange {
             'close': this.safeNumber (ticker, 'close'),
             'last': this.safeNumber (ticker, 'close'),
             'previousClose': undefined,
-            'change': this.safeNumber (ticker, 'change'),
+            'change': undefined,
             'percentage': undefined,
             'average': undefined,
             'baseVolume': this.safeNumber (ticker, 'volume'),

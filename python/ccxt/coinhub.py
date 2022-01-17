@@ -200,7 +200,7 @@ class coinhub(Exchange):
             'close': self.safe_number(ticker, 'close'),
             'last': self.safe_number(ticker, 'close'),
             'previousClose': None,
-            'change': self.safe_number(ticker, 'change'),
+            'change': None,
             'percentage': None,
             'average': None,
             'baseVolume': self.safe_number(ticker, 'volume'),

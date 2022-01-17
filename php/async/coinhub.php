@@ -207,7 +207,7 @@ class coinhub extends Exchange {
             'close' => $this->safe_number($ticker, 'close'),
             'last' => $this->safe_number($ticker, 'close'),
             'previousClose' => null,
-            'change' => $this->safe_number($ticker, 'change'),
+            'change' => null,
             'percentage' => null,
             'average' => null,
             'baseVolume' => $this->safe_number($ticker, 'volume'),
