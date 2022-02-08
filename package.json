@@ -601,7 +601,9 @@
     "complex.mn",
     "c",
     "corex.mn",
-    "complex"
+    "complex",
+    "capex.mn",
+    "capex"
   ],
   "collective": {
     "type": "opencollective",

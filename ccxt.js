@@ -83,6 +83,7 @@ const exchanges = {
     'bw':                      require ('./js/bw.js'),
     'bybit':                   require ('./js/bybit.js'),
     'bytetrade':               require ('./js/bytetrade.js'),
+    'capex':                   require ('./js/capex.js'),
     'cdax':                    require ('./js/cdax.js'),
     'cex':                     require ('./js/cex.js'),
     'coinbase':                require ('./js/coinbase.js'),

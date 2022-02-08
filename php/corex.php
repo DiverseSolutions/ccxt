@@ -186,7 +186,7 @@ class corex extends Exchange {
         // }
         $marketId = $this->safe_string($ticker, 'trading_pairs');
         $symbol = $this->safe_symbol($marketId, $market);
-        $baseVolume = $ticker['last'] && $ticker['vol'] ? parseFloat($ticker['vol']) / parseFloat($ticker['last']) : 0;
+        $baseVolume = $ticker['last'] && $ticker['vol'] ? floatval($ticker['vol']) / floatval($ticker['last']) : 0;
         return array(
             'symbol' => $symbol,
             'timestamp' => $timestamp,

@@ -183,7 +183,7 @@ module.exports = class corex extends Exchange {
         // }
         const marketId = this.safeString (ticker, 'trading_pairs');
         const symbol = this.safeSymbol (marketId, market);
-        const baseVolume = ticker['last'] && ticker['vol'] ? parseFloat(ticker['vol']) / parseFloat(ticker['last']) : 0;
+        const baseVolume = ticker['last'] && ticker['vol'] ? parseFloat (ticker['vol']) / parseFloat (ticker['last']) : 0;
         return {
             'symbol': symbol,
             'timestamp': timestamp,

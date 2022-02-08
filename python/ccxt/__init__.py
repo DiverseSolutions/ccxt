@@ -109,6 +109,7 @@ from ccxt.buda import buda                                  # noqa: F401
 from ccxt.bw import bw                                      # noqa: F401
 from ccxt.bybit import bybit                                # noqa: F401
 from ccxt.bytetrade import bytetrade                        # noqa: F401
+from ccxt.capex import capex                                # noqa: F401
 from ccxt.cdax import cdax                                  # noqa: F401
 from ccxt.cex import cex                                    # noqa: F401
 from ccxt.coinbase import coinbase                          # noqa: F401
@@ -231,6 +232,7 @@ exchanges = [
     'bw',
     'bybit',
     'bytetrade',
+    'capex',
     'cdax',
     'cex',
     'coinbase',

@@ -91,6 +91,7 @@ from ccxt.async_support.buda import buda                                  # noqa
 from ccxt.async_support.bw import bw                                      # noqa: F401
 from ccxt.async_support.bybit import bybit                                # noqa: F401
 from ccxt.async_support.bytetrade import bytetrade                        # noqa: F401
+from ccxt.async_support.capex import capex                                # noqa: F401
 from ccxt.async_support.cdax import cdax                                  # noqa: F401
 from ccxt.async_support.cex import cex                                    # noqa: F401
 from ccxt.async_support.coinbase import coinbase                          # noqa: F401
@@ -213,6 +214,7 @@ exchanges = [
     'bw',
     'bybit',
     'bytetrade',
+    'capex',
     'cdax',
     'cex',
     'coinbase',

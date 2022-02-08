@@ -102,6 +102,7 @@ class Exchange {
         'bw',
         'bybit',
         'bytetrade',
+        'capex',
         'cdax',
         'cex',
         'coinbase',
