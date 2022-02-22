@@ -603,7 +603,8 @@
     "corex.mn",
     "complex",
     "capex.mn",
-    "capex"
+    "capex",
+    "xmeta"
   ],
   "collective": {
     "type": "opencollective",

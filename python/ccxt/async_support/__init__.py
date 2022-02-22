@@ -167,6 +167,7 @@ from ccxt.async_support.vcc import vcc                                    # noqa
 from ccxt.async_support.wavesexchange import wavesexchange                # noqa: F401
 from ccxt.async_support.whitebit import whitebit                          # noqa: F401
 from ccxt.async_support.xena import xena                                  # noqa: F401
+from ccxt.async_support.xmeta import xmeta                                # noqa: F401
 from ccxt.async_support.yobit import yobit                                # noqa: F401
 from ccxt.async_support.zaif import zaif                                  # noqa: F401
 from ccxt.async_support.zb import zb                                      # noqa: F401
@@ -290,6 +291,7 @@ exchanges = [
     'wavesexchange',
     'whitebit',
     'xena',
+    'xmeta',
     'yobit',
     'zaif',
     'zb',

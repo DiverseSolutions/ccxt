@@ -178,6 +178,7 @@ class Exchange {
         'wavesexchange',
         'whitebit',
         'xena',
+        'xmeta',
         'yobit',
         'zaif',
         'zb',
