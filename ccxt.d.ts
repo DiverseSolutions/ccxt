@@ -501,6 +501,7 @@ declare module 'ccxt' {
     export class huobi extends Exchange {}
     export class huobijp extends Exchange {}
     export class huobipro extends huobi {}
+    export class idax extends Exchange {}
     export class idex extends Exchange {}
     export class independentreserve extends Exchange {}
     export class indodax extends Exchange {}
@@ -627,6 +628,7 @@ declare module 'ccxt' {
         | 'huobi'
         | 'huobijp'
         | 'huobipro'
+        | 'idax'
         | 'idex'
         | 'independentreserve'
         | 'indodax'

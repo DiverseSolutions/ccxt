@@ -127,6 +127,7 @@ from ccxt.async_support.hollaex import hollaex                            # noqa
 from ccxt.async_support.huobi import huobi                                # noqa: F401
 from ccxt.async_support.huobijp import huobijp                            # noqa: F401
 from ccxt.async_support.huobipro import huobipro                          # noqa: F401
+from ccxt.async_support.idax import idax                                  # noqa: F401
 from ccxt.async_support.idex import idex                                  # noqa: F401
 from ccxt.async_support.independentreserve import independentreserve      # noqa: F401
 from ccxt.async_support.indodax import indodax                            # noqa: F401
@@ -251,6 +252,7 @@ exchanges = [
     'huobi',
     'huobijp',
     'huobipro',
+    'idax',
     'idex',
     'independentreserve',
     'indodax',

@@ -44,15 +44,15 @@ class xmeta(Exchange):
             },
             'urls': {
                 'test': {
-                    'market': 'https://sapi.coinhub.mn/v1',
-                    'public': 'https://sapi.coinhub.mn/v1',
+                    'market': 'https://exchange-proxy.krypto.mn/x-meta',
+                    'public': 'https://exchange-proxy.krypto.mn/x-meta',
                 },
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
                     'proxy': 'https://exchange-proxy.krypto.mn/x-meta',
                 },
-                'www': 'https://www.byte-trade.com',
-                'doc': 'https://docs.byte-trade.com/#description',
+                'www': 'https://www.x-meta.com',
+                'doc': 'https://www.x-meta.com',
             },
             'api': {
                 'proxy': {

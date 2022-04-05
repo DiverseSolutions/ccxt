@@ -138,6 +138,7 @@ class Exchange {
         'huobi',
         'huobijp',
         'huobipro',
+        'idax',
         'idex',
         'independentreserve',
         'indodax',

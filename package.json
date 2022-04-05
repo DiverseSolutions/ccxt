@@ -604,7 +604,10 @@
     "complex",
     "capex.mn",
     "capex",
-    "xmeta"
+    "xmeta",
+    "idax.exchange",
+    "idax",
+    "x-meta.com"
   ],
   "collective": {
     "type": "opencollective",

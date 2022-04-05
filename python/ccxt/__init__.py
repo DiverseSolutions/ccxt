@@ -145,6 +145,7 @@ from ccxt.hollaex import hollaex                            # noqa: F401
 from ccxt.huobi import huobi                                # noqa: F401
 from ccxt.huobijp import huobijp                            # noqa: F401
 from ccxt.huobipro import huobipro                          # noqa: F401
+from ccxt.idax import idax                                  # noqa: F401
 from ccxt.idex import idex                                  # noqa: F401
 from ccxt.independentreserve import independentreserve      # noqa: F401
 from ccxt.indodax import indodax                            # noqa: F401
@@ -269,6 +270,7 @@ exchanges = [
     'huobi',
     'huobijp',
     'huobipro',
+    'idax',
     'idex',
     'independentreserve',
     'indodax',
