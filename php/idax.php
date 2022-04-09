@@ -234,11 +234,13 @@ class idax extends Exchange {
         for ($i = 0; $i < count($marketKeys); $i++) {
             $marketKey = $marketKeys[$i];
             $market = $this->markets[$marketKey]
-            $ticker = $response['data'][$market['id']]
-            $ticker['id'] = $market['id'];
-            $ticker['symbol'] = $market['symbol'];
-            $ticker['timestamp'] = $response['timestamp']
-            $tickers[] = $ticker)
+            if ($this->safe_value($response['data'], $market['id'])) {
+                $ticker = $response['data'][$market['id']]
+                $ticker['id'] = $market['id'];
+                $ticker['symbol'] = $market['symbol'];
+                $ticker['timestamp'] = $response['timestamp']
+                $tickers[] = $ticker)
+            }
         }
         return $this->parse_tickers($tickers, $symbols;
     }

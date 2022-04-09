@@ -231,11 +231,13 @@ module.exports = class idax extends Exchange {
         for (let i=0; i<marketKeys.length; i++) {
             const marketKey = marketKeys[i];
             const market = this.markets[marketKey]
-            const ticker = response['data'][market['id']]
-            ticker['id'] = market['id'];
-            ticker['symbol'] = market['symbol'];
-            ticker['timestamp'] = response['timestamp']
-            tickers.push (ticker)
+            if (this.safeValue(response['data'], market['id'])) {
+                const ticker = response['data'][market['id']]
+                ticker['id'] = market['id'];
+                ticker['symbol'] = market['symbol'];
+                ticker['timestamp'] = response['timestamp']
+                tickers.push (ticker)
+            }
         }
         return this.parseTickers (tickers, symbols);
     }

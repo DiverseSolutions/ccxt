@@ -229,11 +229,12 @@ class idax(Exchange):
         for i in range(0, len(marketKeys)):
             marketKey = marketKeys[i]
             market = self.markets[marketKey]
-            ticker = response['data'][market['id']]
-            ticker['id'] = market['id']
-            ticker['symbol'] = market['symbol']
-            ticker['timestamp'] = response['timestamp']
-            tickers.append(ticker)
+            if self.safe_value(response['data'], market['id']):
+                ticker = response['data'][market['id']]
+                ticker['id'] = market['id']
+                ticker['symbol'] = market['symbol']
+                ticker['timestamp'] = response['timestamp']
+                tickers.append(ticker)
         return self.parse_tickers(tickers, symbols)
 
     def parse_ticker(self, ticker, market=None):
