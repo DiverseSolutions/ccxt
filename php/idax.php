@@ -152,10 +152,10 @@ class idax extends Exchange {
         // }
         $marketsRaw = $response['data']['market']['market'];
         $result = array();
-        $marketKeys = is_array($marketsRaw) ? array_keys($marketsRaw) : array()
+        $marketKeys = is_array($marketsRaw) ? array_keys($marketsRaw) : array();
         for ($i = 0; $i < count($marketKeys); $i++) {
             $k = $marketKeys[$i];
-            $symbolKeys = is_array($marketsRaw[$k]) ? array_keys($marketsRaw[$k]) : array()
+            $symbolKeys = is_array($marketsRaw[$k]) ? array_keys($marketsRaw[$k]) : array();
             for ($j = 0; $j < count($symbolKeys); $j++) {
                 $id = $symbolKeys[$j];
                 $pairs = explode('/', $id)

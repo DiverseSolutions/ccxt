@@ -43,7 +43,7 @@ module.exports = class idax extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
-                   'proxy': 'https://exchange-proxy.krypto.mn/idax',
+                    'proxy': 'https://exchange-proxy.krypto.mn/idax',
                 },
                 'www': 'https://idax.exchange',
                 'doc': 'https://dax.exchange',
@@ -149,13 +149,13 @@ module.exports = class idax extends Exchange {
         // }
         const marketsRaw = response['data']['market']['market'];
         const result = [];
-        const marketKeys = Object.keys (marketsRaw)
-        for (let i=0; i<marketKeys.length; i++) {
+        const marketKeys = Object.keys (marketsRaw);
+        for (let i = 0; i < marketKeys.length; i++) {
             const k = marketKeys[i];
-            const symbolKeys = Object.keys (marketsRaw[k])
-            for (let j=0; j < symbolKeys.length; j++) {
+            const symbolKeys = Object.keys (marketsRaw[k]);
+            for (let j = 0; j < symbolKeys.length; j++) {
                 const id = symbolKeys[j];
-                const pairs = id.split ('/')
+                const pairs = id.split ('/');
                 const base = pairs[0].toUpperCase ();
                 const quote = pairs[1].toUpperCase ();
                 const baseId = base.toLowerCase ();
@@ -227,16 +227,16 @@ module.exports = class idax extends Exchange {
         //     "timestamp": 1649129268000
         // }
         const tickers = [];
-        const marketKeys = Object.keys (this.markets)
-        for (let i=0; i<marketKeys.length; i++) {
+        const marketKeys = Object.keys (this.markets);
+        for (let i = 0; i<marketKeys.length; i++) {
             const marketKey = marketKeys[i];
-            const market = this.markets[marketKey]
-            if (this.safeValue(response['data'], market['id'])) {
-                const ticker = response['data'][market['id']]
+            const market = this.markets[marketKey];
+            if (this.safeValue (response['data'], market['id'])) {
+                const ticker = response['data'][market['id']];
                 ticker['id'] = market['id'];
                 ticker['symbol'] = market['symbol'];
-                ticker['timestamp'] = response['timestamp']
-                tickers.push (ticker)
+                ticker['timestamp'] = response['timestamp'];
+                tickers.push (ticker);
             }
         }
         return this.parseTickers (tickers, symbols);
@@ -255,12 +255,12 @@ module.exports = class idax extends Exchange {
         //     id: 'adaeth',
         //     symbol: 'ADA/ETH'
         // }
-        const symbol = ticker['symbol']
+        const symbol = ticker['symbol'];
         let baseVol = 0;
         let quoteVol = 0;
         if (ticker['vol'] && ticker['close']) {
-            baseVol = parseFloat (ticker['vol'])
-            quoteVol = parseFloat (baseVol) * parseFloat (ticker['close'])
+            baseVol = parseFloat (ticker['vol']);
+            quoteVol = parseFloat (baseVol) * parseFloat (ticker['close']);
         }
         return {
             'symbol': symbol,
@@ -273,9 +273,9 @@ module.exports = class idax extends Exchange {
             'ask': undefined,
             'askVolume': undefined,
             'vwap': undefined,
-            'open': parseFloat(ticker['open']),
-            'close': parseFloat(ticker['close']),
-            'last': parseFloat(ticker['close']),
+            'open': parseFloat (ticker['open']),
+            'close': parseFloat (ticker['close']),
+            'last': parseFloat (ticker['close']),
             'previousClose': undefined,
             'change': undefined,
             'percentage': undefined,
