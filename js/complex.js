@@ -157,8 +157,8 @@ module.exports = class complex extends Exchange {
         const marketId = this.safeString (ticker, 'symbol');
         const symbol = this.safeSymbol (marketId, market);
         const price = this.safeNumber (ticker, 'lastTradeRate');
-        const baseVol = this.safeNumber (ticker, 'volume');
-        const quoteVol = baseVol * price;
+        const quoteVol = this.safeNumber (ticker, 'volume');
+        const baseVol = quoteVol / price;
         return {
             'symbol': symbol,
             'timestamp': undefined,

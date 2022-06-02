@@ -160,8 +160,8 @@ class complex extends Exchange {
         $marketId = $this->safe_string($ticker, 'symbol');
         $symbol = $this->safe_symbol($marketId, $market);
         $price = $this->safe_number($ticker, 'lastTradeRate');
-        $baseVol = $this->safe_number($ticker, 'volume');
-        $quoteVol = $baseVol * $price;
+        $quoteVol = $this->safe_number($ticker, 'volume');
+        $baseVol = $quoteVol / $price;
         return array(
             'symbol' => $symbol,
             'timestamp' => null,

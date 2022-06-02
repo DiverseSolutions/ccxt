@@ -155,8 +155,8 @@ class complex(Exchange):
         marketId = self.safe_string(ticker, 'symbol')
         symbol = self.safe_symbol(marketId, market)
         price = self.safe_number(ticker, 'lastTradeRate')
-        baseVol = self.safe_number(ticker, 'volume')
-        quoteVol = baseVol * price
+        quoteVol = self.safe_number(ticker, 'volume')
+        baseVol = quoteVol / price
         return {
             'symbol': symbol,
             'timestamp': None,
