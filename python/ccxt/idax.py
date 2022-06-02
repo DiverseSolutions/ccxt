@@ -45,7 +45,7 @@ class idax(Exchange):
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
-                   'proxy': 'https://exchange-proxy.krypto.mn/idax',
+                    'proxy': 'https://exchange-proxy.krypto.mn/idax',
                 },
                 'www': 'https://idax.exchange',
                 'doc': 'https://dax.exchange',

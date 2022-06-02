@@ -46,7 +46,7 @@ class complex extends Exchange {
             'urls' => array(
                 'logo' => 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api' => array(
-                    'public' => 'http://52.79.140.119:8000/complex',
+                    'public' => 'https://exchange-proxy.krypto.mn/complex',
                 ),
                 'www' => 'https://complex.mn',
                 'doc' => 'https://complex.mn',
@@ -68,26 +68,16 @@ class complex extends Exchange {
 
     public function fetch_markets($params = array ()) {
         $response = $this->publicGetTickers ($params);
-        // {
-        //     "status" => "success",
-        //     "data" => array(
-        //         {
-        //             "symbol" => "AAVE-USDT",
-        //             "high" => "211.82600000",
-        //             "low" => "193.55300000",
-        //             "volume" => "367.11047577",
-        //             "quoteVolume" => "73326.58397790",
-        //             "percentChange" => "7.16",
-        //             "updatedAt" => "2022-01-11T16:17:40.403Z",
-        //             "lastTradeRate" => "211.82600000",
-        //             "bidRate" => "212.00100000",
-        //             "askRate" => "212.37300000",
-        //             "_id" => "60d5675465c8d98e910b2ef8",
-        //             "name" => "AAVE-USDT"
-        //         }
-        //     )
-        // }
-        $markets = $response['data'];
+        // array(
+        //     {
+        //     "symbol" => "MNFT-MNT",
+        //     "volume" => "15614833.13",
+        //     "percentChange" => "5.15",
+        //     "name" => "MNFT-MNT",
+        //     "lastTradeRate" => "0.07349"
+        //     }
+        // )
+        $markets = $response;
         $result = array();
         for ($i = 0; $i < count($markets); $i++) {
             $market = $markets[$i];
@@ -147,65 +137,51 @@ class complex extends Exchange {
     public function fetch_tickers($symbols = null, $params = array ()) {
         $this->load_markets();
         $response = $this->publicGetTickers ($params);
-        // {
-        //     "status" => "success",
-        //     "data" => array(
-        //         {
-        //             "symbol" => "AAVE-USDT",
-        //             "high" => "211.82600000",
-        //             "low" => "193.55300000",
-        //             "volume" => "367.11047577",
-        //             "quoteVolume" => "73326.58397790",
-        //             "percentChange" => "7.16",
-        //             "updatedAt" => "2022-01-11T16:17:40.403Z",
-        //             "lastTradeRate" => "211.82600000",
-        //             "bidRate" => "212.00100000",
-        //             "askRate" => "212.37300000",
-        //             "_id" => "60d5675465c8d98e910b2ef8",
-        //             "name" => "AAVE-USDT"
-        //         }
-        //     )
-        // }
-        return $this->parse_tickers($response['data'], $symbols);
+        // array(
+        //     {
+        //     "symbol" => "MNFT-MNT",
+        //     "volume" => "15614833.13",
+        //     "percentChange" => "5.15",
+        //     "name" => "MNFT-MNT",
+        //     "lastTradeRate" => "0.07349"
+        //     }
+        // )
+        return $this->parse_tickers($response, $symbols);
     }
 
     public function parse_ticker($ticker, $market = null) {
         // {
-        //     "symbol" => "AAVE-USDT",
-        //     "high" => "211.82600000",
-        //     "low" => "193.55300000",
-        //     "volume" => "367.11047577",
-        //     "quoteVolume" => "73326.58397790",
-        //     "percentChange" => "7.16",
-        //     "updatedAt" => "2022-01-11T16:17:40.403Z",
-        //     "lastTradeRate" => "211.82600000",
-        //     "bidRate" => "212.00100000",
-        //     "askRate" => "212.37300000",
-        //     "_id" => "60d5675465c8d98e910b2ef8",
-        //     "name" => "AAVE-USDT"
+        //     "symbol" => "MNFT-MNT",
+        //     "volume" => "15614833.13",
+        //     "percentChange" => "5.15",
+        //     "name" => "MNFT-MNT",
+        //     "lastTradeRate" => "0.07349"
         // }
         $marketId = $this->safe_string($ticker, 'symbol');
         $symbol = $this->safe_symbol($marketId, $market);
+        $price = $this->safe_number($ticker, 'lastTradeRate');
+        $baseVol = $this->safe_number($ticker, 'volume');
+        $quoteVol = $baseVol * $price;
         return array(
             'symbol' => $symbol,
             'timestamp' => null,
             'datetime' => null,
-            'high' => $ticker['high'],
-            'low' => $ticker['low'],
-            'bid' => $ticker['bidRate'],
+            'high' => null,
+            'low' => null,
+            'bid' => null,
             'bidVolume' => null,
-            'ask' => $ticker['askRate'],
+            'ask' => null,
             'askVolume' => null,
             'vwap' => null,
             'open' => null,
-            'close' => $ticker['lastTradeRate'],
-            'last' => $ticker['lastTradeRate'],
+            'close' => $price,
+            'last' => $price,
             'previousClose' => null,
             'change' => null,
             'percentage' => null,
             'average' => null,
-            'baseVolume' => $ticker['volume'],
-            'quoteVolume' => $ticker['quoteVolume'],
+            'baseVolume' => $baseVol,
+            'quoteVolume' => $quoteVol,
             'info' => $ticker,
         );
     }

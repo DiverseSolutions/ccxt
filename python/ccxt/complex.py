@@ -45,7 +45,7 @@ class complex(Exchange):
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
-                    'public': 'http://52.79.140.119:8000/complex',
+                    'public': 'https://exchange-proxy.krypto.mn/complex',
                 },
                 'www': 'https://complex.mn',
                 'doc': 'https://complex.mn',
@@ -66,26 +66,16 @@ class complex(Exchange):
 
     def fetch_markets(self, params={}):
         response = self.publicGetTickers(params)
-        # {
-        #     "status": "success",
-        #     "data": [
-        #         {
-        #             "symbol": "AAVE-USDT",
-        #             "high": "211.82600000",
-        #             "low": "193.55300000",
-        #             "volume": "367.11047577",
-        #             "quoteVolume": "73326.58397790",
-        #             "percentChange": "7.16",
-        #             "updatedAt": "2022-01-11T16:17:40.403Z",
-        #             "lastTradeRate": "211.82600000",
-        #             "bidRate": "212.00100000",
-        #             "askRate": "212.37300000",
-        #             "_id": "60d5675465c8d98e910b2ef8",
-        #             "name": "AAVE-USDT"
-        #         }
-        #     ]
-        # }
-        markets = response['data']
+        # [
+        #     {
+        #     "symbol": "MNFT-MNT",
+        #     "volume": "15614833.13",
+        #     "percentChange": "5.15",
+        #     "name": "MNFT-MNT",
+        #     "lastTradeRate": "0.07349"
+        #     }
+        # ]
+        markets = response
         result = []
         for i in range(0, len(markets)):
             market = markets[i]
@@ -143,64 +133,50 @@ class complex(Exchange):
     def fetch_tickers(self, symbols=None, params={}):
         self.load_markets()
         response = self.publicGetTickers(params)
-        # {
-        #     "status": "success",
-        #     "data": [
-        #         {
-        #             "symbol": "AAVE-USDT",
-        #             "high": "211.82600000",
-        #             "low": "193.55300000",
-        #             "volume": "367.11047577",
-        #             "quoteVolume": "73326.58397790",
-        #             "percentChange": "7.16",
-        #             "updatedAt": "2022-01-11T16:17:40.403Z",
-        #             "lastTradeRate": "211.82600000",
-        #             "bidRate": "212.00100000",
-        #             "askRate": "212.37300000",
-        #             "_id": "60d5675465c8d98e910b2ef8",
-        #             "name": "AAVE-USDT"
-        #         }
-        #     ]
-        # }
-        return self.parse_tickers(response['data'], symbols)
+        # [
+        #     {
+        #     "symbol": "MNFT-MNT",
+        #     "volume": "15614833.13",
+        #     "percentChange": "5.15",
+        #     "name": "MNFT-MNT",
+        #     "lastTradeRate": "0.07349"
+        #     }
+        # ]
+        return self.parse_tickers(response, symbols)
 
     def parse_ticker(self, ticker, market=None):
         # {
-        #     "symbol": "AAVE-USDT",
-        #     "high": "211.82600000",
-        #     "low": "193.55300000",
-        #     "volume": "367.11047577",
-        #     "quoteVolume": "73326.58397790",
-        #     "percentChange": "7.16",
-        #     "updatedAt": "2022-01-11T16:17:40.403Z",
-        #     "lastTradeRate": "211.82600000",
-        #     "bidRate": "212.00100000",
-        #     "askRate": "212.37300000",
-        #     "_id": "60d5675465c8d98e910b2ef8",
-        #     "name": "AAVE-USDT"
+        #     "symbol": "MNFT-MNT",
+        #     "volume": "15614833.13",
+        #     "percentChange": "5.15",
+        #     "name": "MNFT-MNT",
+        #     "lastTradeRate": "0.07349"
         # }
         marketId = self.safe_string(ticker, 'symbol')
         symbol = self.safe_symbol(marketId, market)
+        price = self.safe_number(ticker, 'lastTradeRate')
+        baseVol = self.safe_number(ticker, 'volume')
+        quoteVol = baseVol * price
         return {
             'symbol': symbol,
             'timestamp': None,
             'datetime': None,
-            'high': ticker['high'],
-            'low': ticker['low'],
-            'bid': ticker['bidRate'],
+            'high': None,
+            'low': None,
+            'bid': None,
             'bidVolume': None,
-            'ask': ticker['askRate'],
+            'ask': None,
             'askVolume': None,
             'vwap': None,
             'open': None,
-            'close': ticker['lastTradeRate'],
-            'last': ticker['lastTradeRate'],
+            'close': price,
+            'last': price,
             'previousClose': None,
             'change': None,
             'percentage': None,
             'average': None,
-            'baseVolume': ticker['volume'],
-            'quoteVolume': ticker['quoteVolume'],
+            'baseVolume': baseVol,
+            'quoteVolume': quoteVol,
             'info': ticker,
         }
 

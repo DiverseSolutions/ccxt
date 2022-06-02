@@ -46,7 +46,7 @@ class idax extends Exchange {
             'urls' => array(
                 'logo' => 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api' => array(
-                   'proxy' => 'https://exchange-proxy.krypto.mn/idax',
+                    'proxy' => 'https://exchange-proxy.krypto.mn/idax',
                 ),
                 'www' => 'https://idax.exchange',
                 'doc' => 'https://dax.exchange',
@@ -158,7 +158,7 @@ class idax extends Exchange {
             $symbolKeys = is_array($marketsRaw[$k]) ? array_keys($marketsRaw[$k]) : array();
             for ($j = 0; $j < count($symbolKeys); $j++) {
                 $id = $symbolKeys[$j];
-                $pairs = explode('/', $id)
+                $pairs = explode('/', $id);
                 $base = strtoupper($pairs[0]);
                 $quote = strtoupper($pairs[1]);
                 $baseId = strtolower($base);
@@ -230,19 +230,19 @@ class idax extends Exchange {
         //     "timestamp" => 1649129268000
         // }
         $tickers = array();
-        $marketKeys = is_array($this->markets) ? array_keys($this->markets) : array()
+        $marketKeys = is_array($this->markets) ? array_keys($this->markets) : array();
         for ($i = 0; $i < count($marketKeys); $i++) {
             $marketKey = $marketKeys[$i];
-            $market = $this->markets[$marketKey]
+            $market = $this->markets[$marketKey];
             if ($this->safe_value($response['data'], $market['id'])) {
-                $ticker = $response['data'][$market['id']]
+                $ticker = $response['data'][$market['id']];
                 $ticker['id'] = $market['id'];
                 $ticker['symbol'] = $market['symbol'];
-                $ticker['timestamp'] = $response['timestamp']
-                $tickers[] = $ticker)
+                $ticker['timestamp'] = $response['timestamp'];
+                $tickers[] = $ticker;
             }
         }
-        return $this->parse_tickers($tickers, $symbols;
+        return $this->parse_tickers($tickers, $symbols);
     }
 
     public function parse_ticker($ticker, $market = null) {
@@ -258,12 +258,12 @@ class idax extends Exchange {
         //     id => 'adaeth',
         //     $symbol => 'ADA/ETH'
         // }
-        $symbol = $ticker['symbol']
+        $symbol = $ticker['symbol'];
         $baseVol = 0;
         $quoteVol = 0;
         if ($ticker['vol'] && $ticker['close']) {
-            $baseVol = floatval($ticker['vol'])
-            $quoteVol = floatval($baseVol) * floatval($ticker['close'])
+            $baseVol = floatval($ticker['vol']);
+            $quoteVol = floatval($baseVol) * floatval($ticker['close']);
         }
         return array(
             'symbol' => $symbol,
@@ -276,9 +276,9 @@ class idax extends Exchange {
             'ask' => null,
             'askVolume' => null,
             'vwap' => null,
-            'open' => parseFloat($ticker['open']),
-            'close' => parseFloat($ticker['close']),
-            'last' => parseFloat($ticker['close']),
+            'open' => floatval($ticker['open']),
+            'close' => floatval($ticker['close']),
+            'last' => floatval($ticker['close']),
             'previousClose' => null,
             'change' => null,
             'percentage' => null,

@@ -43,7 +43,7 @@ module.exports = class complex extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
-                    'public': 'http://52.79.140.119:8000/complex',
+                    'public': 'https://exchange-proxy.krypto.mn/complex',
                 },
                 'www': 'https://complex.mn',
                 'doc': 'https://complex.mn',
@@ -65,26 +65,16 @@ module.exports = class complex extends Exchange {
 
     async fetchMarkets (params = {}) {
         const response = await this.publicGetTickers (params);
-        // {
-        //     "status": "success",
-        //     "data": [
-        //         {
-        //             "symbol": "AAVE-USDT",
-        //             "high": "211.82600000",
-        //             "low": "193.55300000",
-        //             "volume": "367.11047577",
-        //             "quoteVolume": "73326.58397790",
-        //             "percentChange": "7.16",
-        //             "updatedAt": "2022-01-11T16:17:40.403Z",
-        //             "lastTradeRate": "211.82600000",
-        //             "bidRate": "212.00100000",
-        //             "askRate": "212.37300000",
-        //             "_id": "60d5675465c8d98e910b2ef8",
-        //             "name": "AAVE-USDT"
-        //         }
-        //     ]
-        // }
-        const markets = response['data'];
+        // [
+        //     {
+        //     "symbol": "MNFT-MNT",
+        //     "volume": "15614833.13",
+        //     "percentChange": "5.15",
+        //     "name": "MNFT-MNT",
+        //     "lastTradeRate": "0.07349"
+        //     }
+        // ]
+        const markets = response;
         const result = [];
         for (let i = 0; i < markets.length; i++) {
             const market = markets[i];
@@ -144,65 +134,51 @@ module.exports = class complex extends Exchange {
     async fetchTickers (symbols = undefined, params = {}) {
         await this.loadMarkets ();
         const response = await this.publicGetTickers (params);
-        // {
-        //     "status": "success",
-        //     "data": [
-        //         {
-        //             "symbol": "AAVE-USDT",
-        //             "high": "211.82600000",
-        //             "low": "193.55300000",
-        //             "volume": "367.11047577",
-        //             "quoteVolume": "73326.58397790",
-        //             "percentChange": "7.16",
-        //             "updatedAt": "2022-01-11T16:17:40.403Z",
-        //             "lastTradeRate": "211.82600000",
-        //             "bidRate": "212.00100000",
-        //             "askRate": "212.37300000",
-        //             "_id": "60d5675465c8d98e910b2ef8",
-        //             "name": "AAVE-USDT"
-        //         }
-        //     ]
-        // }
-        return this.parseTickers (response['data'], symbols);
+        // [
+        //     {
+        //     "symbol": "MNFT-MNT",
+        //     "volume": "15614833.13",
+        //     "percentChange": "5.15",
+        //     "name": "MNFT-MNT",
+        //     "lastTradeRate": "0.07349"
+        //     }
+        // ]
+        return this.parseTickers (response, symbols);
     }
 
     parseTicker (ticker, market = undefined) {
         // {
-        //     "symbol": "AAVE-USDT",
-        //     "high": "211.82600000",
-        //     "low": "193.55300000",
-        //     "volume": "367.11047577",
-        //     "quoteVolume": "73326.58397790",
-        //     "percentChange": "7.16",
-        //     "updatedAt": "2022-01-11T16:17:40.403Z",
-        //     "lastTradeRate": "211.82600000",
-        //     "bidRate": "212.00100000",
-        //     "askRate": "212.37300000",
-        //     "_id": "60d5675465c8d98e910b2ef8",
-        //     "name": "AAVE-USDT"
+        //     "symbol": "MNFT-MNT",
+        //     "volume": "15614833.13",
+        //     "percentChange": "5.15",
+        //     "name": "MNFT-MNT",
+        //     "lastTradeRate": "0.07349"
         // }
         const marketId = this.safeString (ticker, 'symbol');
         const symbol = this.safeSymbol (marketId, market);
+        const price = this.safeNumber (ticker, 'lastTradeRate');
+        const baseVol = this.safeNumber (ticker, 'volume');
+        const quoteVol = baseVol * price;
         return {
             'symbol': symbol,
             'timestamp': undefined,
             'datetime': undefined,
-            'high': ticker['high'],
-            'low': ticker['low'],
-            'bid': ticker['bidRate'],
+            'high': undefined,
+            'low': undefined,
+            'bid': undefined,
             'bidVolume': undefined,
-            'ask': ticker['askRate'],
+            'ask': undefined,
             'askVolume': undefined,
             'vwap': undefined,
             'open': undefined,
-            'close': ticker['lastTradeRate'],
-            'last': ticker['lastTradeRate'],
+            'close': price,
+            'last': price,
             'previousClose': undefined,
             'change': undefined,
             'percentage': undefined,
             'average': undefined,
-            'baseVolume': ticker['volume'],
-            'quoteVolume': ticker['quoteVolume'],
+            'baseVolume': baseVol,
+            'quoteVolume': quoteVol,
             'info': ticker,
         };
     }
