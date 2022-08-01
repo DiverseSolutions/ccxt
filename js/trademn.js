@@ -71,12 +71,12 @@ module.exports = class trademn extends Exchange {
         //     },
         //     "timestamp": 1659353716
         // }
-        const data = response.data;
+        const data = response['data'];
         const keys = Object.keys (data);
         for (let i = 0; i < keys.length; i++) {
             data[keys[i]]['symbol'] = keys[i];
         }
-        return this.parseTickers (response.data, symbols);
+        return this.parseTickers (response['data'], symbols);
     }
 
     parseTicker (ticker, market = undefined) {

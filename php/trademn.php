@@ -73,12 +73,12 @@ class trademn extends Exchange {
         //     ),
         //     "timestamp" => 1659353716
         // }
-        $data = $response->data;
+        $data = $response['data'];
         $keys = is_array($data) ? array_keys($data) : array();
-        for ($i = 0; $i < $keys; $i++) {
-            $data[$keys[$i]].symbol = $keys[$i];
+        for ($i = 0; $i < count($keys); $i++) {
+            $data[$keys[$i]]['symbol'] = $keys[$i];
         }
-        return $this->parse_tickers($response->data, $symbols);
+        return $this->parse_tickers($response['data'], $symbols);
     }
 
     public function parse_ticker($ticker, $market = null) {

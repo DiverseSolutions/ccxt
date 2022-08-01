@@ -71,11 +71,11 @@ class trademn(Exchange):
         #     },
         #     "timestamp": 1659353716
         # }
-        data = response.data
+        data = response['data']
         keys = list(data.keys())
-        for i in range(0, keys):
-            data[keys[i]].symbol = keys[i]
-        return self.parse_tickers(response.data, symbols)
+        for i in range(0, len(keys)):
+            data[keys[i]]['symbol'] = keys[i]
+        return self.parse_tickers(response['data'], symbols)
 
     def parse_ticker(self, ticker, market=None):
         timestamp = None
