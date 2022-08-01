@@ -5,7 +5,6 @@
 
 from ccxt.base.exchange import Exchange
 from ccxt.base.errors import ExchangeError
-from ccxt.base.errors import NotSupported
 
 
 class trademn(Exchange):
@@ -29,14 +28,14 @@ class trademn(Exchange):
                 'fetchCurrencies': False,
                 'fetchDepositAddress': False,
                 'fetchDeposits': False,
-                'fetchMarkets': True,
+                'fetchMarkets': False,
                 'fetchMyTrades': False,
                 'fetchOHLCV': False,
                 'fetchOpenOrders': False,
                 'fetchOrder': False,
                 'fetchOrderBook': False,
                 'fetchOrders': False,
-                'fetchTicker': True,
+                'fetchTicker': False,
                 'fetchTickers': True,
                 'fetchTrades': False,
                 'fetchWithdrawals': False,
@@ -46,203 +45,71 @@ class trademn(Exchange):
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
                     'public': 'https://trade.mn:116/api/v2',
+                    'proxy': 'https://service-api.krypto.mn/exchange-proxy',
                 },
                 'www': 'https://trade.mn',
                 'doc': 'https://trade.mn',
             },
             'api': {
-                'public': {
+                'proxy': {
                     'get': [
-                        'exchange/checkpair',
+                        'tickers/trademn',
                     ],
                 },
             },
         })
 
-    def fetch_markets(self, params={}):
-        response = self.publicGetExchangeCheckpair(params)
-        # {
-        #     "status": True,
-        #     "code": "100/1",
-        #     "pairName": [
-        #         {
-        #             "name": "TRD/MNT",
-        #             "id": 323,
-        #             "code": "TRD",
-        #             "fromCurrencyId": "203",
-        #             "toCurrencyId": "1",
-        #             "lastPrice": 1.11,
-        #             "isFiat": "1",
-        #             "nameC": "Digital Exchange Coin",
-        #             "price24H": "1.14",
-        #             "diff": "-0.89",
-        #             "createDate": "2021-08-18 10:50:54.0"
-        #         }
-        #     ],
-        # }
-        markets = response['pairName']
-        result = []
-        for i in range(0, len(markets)):
-            market = markets[i]
-            id = self.safe_string(market, 'name')
-            symbols = id.split('/')
-            base = symbols[0].upper()
-            quote = symbols[1].upper()
-            baseId = base
-            quoteId = quote
-            if baseId in self.commonCurrencies:
-                base = self.commonCurrencies[baseId]
-            if quoteId in self.commonCurrencies:
-                quote = self.commonCurrencies[quoteId]
-            symbol = base + '/' + quote
-            entry = {
-                'id': id,
-                'symbol': symbol,
-                'base': base,
-                'quote': quote,
-                'baseId': baseId,
-                'quoteId': quoteId,
-                'active': True,
-                'taker': None,
-                'maker': None,
-                'type': 'spot',
-                'linear': False,
-                'inverse': False,
-                'contractSize': 1,
-                'spot': True,
-                'margin': False,
-                'future': False,
-                'swap': False,
-                'option': False,
-                'contract': False,
-                'settleId': None,
-                'settle': None,
-                'expiry': None,
-                'expiryDatetime': None,
-                'percentage': False,
-                'tierBased': False,
-                'feeSide': 'get',
-                'precision': {
-                    'price': None,
-                    'amount': None,
-                    'cost': None,
-                },
-                'limits': {
-                    'amount': {
-                        'min': None,
-                        'max': None,
-                    },
-                    'price': None,
-                    'cost': None,
-                },
-                'info': None,
-            }
-            result.append(entry)
-        return result
-
-    def fetch_ticker(self, symbol, params={}):
-        self.load_markets()
-        market = self.market(symbol)
-        request = {
-            'pair': market['id'],
-        }
-        response = self.publicGetExchangeCheckpair(self.extend(request, params))
-        # {
-        #     "status": True,
-        #     "code": "100/1",
-        #     "pairName": [
-        #         {
-        #             "name": "TRD/MNT",
-        #             "id": 323,
-        #             "code": "TRD",
-        #             "fromCurrencyId": "203",
-        #             "toCurrencyId": "1",
-        #             "lastPrice": 1.11,
-        #             "isFiat": "1",
-        #             "nameC": "Digital Exchange Coin",
-        #             "price24H": "1.14",
-        #             "diff": "-0.89",
-        #             "createDate": "2021-08-18 10:50:54.0"
-        #         }
-        #     ],
-        #     "minMax": [
-        #         {
-        #             "currencyId": "100",
-        #             "max24": 122000000,
-        #             "min24": 118008000,
-        #             "toCurrencyId": "1",
-        #             "minTradePrice": 0.0001,
-        #             "q": 0.48042547000000013,
-        #             "p": 58001875.40842133
-        #         }
-        #     ]
-        # }
-        foundTickers = self.filter_by_array(response['pairName'], 'name', market['id'])
-        ticker = foundTickers[market['id']]
-        if not ticker:
-            raise NotSupported(market['id'] + ' not supported')
-        ticker['minMax'] = response['minMax']
-        return self.parse_ticker(ticker, market)
-
     def fetch_tickers(self, symbols=None, params={}):
-        markets = self.load_markets()
-        result = []
-        keys = list(markets.keys())
-        for i in range(0, len(keys)):
-            marketId = markets[keys[i]]['id']
-            ticker = self.fetch_ticker(marketId)
-            result.append(ticker)
-        return self.filter_by_array(result, 'symbol', symbols)
+        response = self.proxyGetTickersTrademn(params)
+        # {
+        #     "data": {
+        #         "DOT/MNT": {
+        #           "change": 0,
+        #           "lastPrice": 19000,
+        #           "volume": 0
+        #         }
+        #     },
+        #     "timestamp": 1659353716
+        # }
+        data = response.data
+        keys = list(data.keys())
+        for i in range(0, keys):
+            data[keys[i]].symbol = keys[i]
+        return self.parse_tickers(response.data, symbols)
 
     def parse_ticker(self, ticker, market=None):
         timestamp = None
         # {
-        #     "name": "TRD/MNT",
-        #     "id": 323,
-        #     "code": "TRD",
-        #     "fromCurrencyId": "203",
-        #     "toCurrencyId": "1",
-        #     "lastPrice": 1.11,
-        #     "isFiat": "1",
-        #     "nameC": "Digital Exchange Coin",
-        #     "price24H": "1.14",
-        #     "diff": "-0.89",
-        #     "createDate": "2021-08-18 10:50:54.0",
-        #     "minMax": [
-        #         {
-        #             "currencyId": "100",
-        #             "max24": 122000000,
-        #             "min24": 118008000,
-        #             "toCurrencyId": "1",
-        #             "minTradePrice": 0.0001,
-        #             "q": 0.48042547000000013,
-        #             "p": 58001875.40842133
-        #         }
-        #     ]
+        #     "change": 0,
+        #     "lastPrice": 19000,
+        #     "volume": 0,
+        #     "symbol": "ARDX/MNT",
+        #     "timestamp": 1659353716
         # }
         marketId = self.safe_string(ticker, 'symbol')
-        symbol = self.safe_symbol(marketId, market)
-        stats = ticker['minMax'][0]
+        symbol = marketId
+        price = self.safe_number(ticker, 'lastPrice')
+        baseVol = self.safe_number(ticker, 'volume')
+        quoteVol = price * baseVol
         return {
             'symbol': symbol,
             'timestamp': timestamp,
-            'datetime': None,
-            'high': self.safe_number(stats, 'max24'),
-            'low': self.safe_number(stats, 'min24'),
+            'high': None,
+            'low': None,
             'bid': None,
             'bidVolume': None,
             'ask': None,
             'askVolume': None,
             'vwap': None,
             'open': None,
-            'close': self.safe_number(ticker, 'lastPrice'),
-            'last': self.safe_number(ticker, 'lastPrice'),
+            'close': price,
+            'last': price,
             'previousClose': None,
             'change': None,
             'percentage': None,
             'average': None,
-            'baseVolume': self.safe_number(stats, 'q'),
-            'quoteVolume': self.safe_number(stats, 'p'),
+            'baseVolume': baseVol,
+            'quoteVolume': quoteVol,
             'info': ticker,
         }
 

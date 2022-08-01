@@ -228,7 +228,7 @@ module.exports = class idax extends Exchange {
         // }
         const tickers = [];
         const marketKeys = Object.keys (this.markets);
-        for (let i = 0; i<marketKeys.length; i++) {
+        for (let i = 0; i < marketKeys.length; i++) {
             const marketKey = marketKeys[i];
             const market = this.markets[marketKey];
             if (this.safeValue (response['data'], market['id'])) {
