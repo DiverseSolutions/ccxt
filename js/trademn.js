@@ -52,7 +52,7 @@ module.exports = class trademn extends Exchange {
             'api': {
                 'proxy': {
                     'get': [
-                        'tickers/trademn',
+                        'trademn/tickers',
                     ],
                 },
             },
@@ -60,7 +60,7 @@ module.exports = class trademn extends Exchange {
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
-        const response = await this.proxyGetTickersTrademn (params);
+        const response = await this.proxyGetTrademnTickers(params);
         // {
         //     "data": {
         //         "DOT/MNT": {

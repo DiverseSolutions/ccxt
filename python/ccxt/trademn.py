@@ -53,14 +53,14 @@ class trademn(Exchange):
             'api': {
                 'proxy': {
                     'get': [
-                        'tickers/trademn',
+                        'trademn/tickers',
                     ],
                 },
             },
         })
 
     def fetch_tickers(self, symbols=None, params={}):
-        response = self.proxyGetTickersTrademn(params)
+        response = self.proxyGetTrademnTickers(params)
         # {
         #     "data": {
         #         "DOT/MNT": {
