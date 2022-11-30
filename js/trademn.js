@@ -60,7 +60,7 @@ module.exports = class trademn extends Exchange {
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
-        const response = await this.proxyGetTrademnTickers(params);
+        const response = await this.proxyGetTrademnTickers (params);
         // {
         //     "data": {
         //         "DOT/MNT": {

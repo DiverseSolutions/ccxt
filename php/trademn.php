@@ -62,7 +62,7 @@ class trademn extends Exchange {
     }
 
     public function fetch_tickers($symbols = null, $params = array ()) {
-        $response = $this->proxyGetTrademnTickers($params);
+        $response = $this->proxyGetTrademnTickers ($params);
         // {
         //     "data" => {
         //         "DOT/MNT" => array(

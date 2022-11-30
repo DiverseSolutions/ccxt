@@ -180,7 +180,7 @@ class corex(Exchange):
         # }
         marketId = self.safe_string(ticker, 'trading_pairs')
         symbol = self.safe_symbol(marketId, market)
-        baseVolume = ticker['last'] and float(ticker['vol']) / float(ticker['last']) if ticker['vol'] else 0
+        baseVolume = float(ticker['last']) and float(ticker['vol']) / float(ticker['last']) if float(ticker['vol']) else 0
         return {
             'symbol': symbol,
             'timestamp': timestamp,
