@@ -55,6 +55,7 @@ class trademn extends Exchange {
                 'proxy' => array(
                     'get' => array(
                         'trademn/tickers',
+                        'trademn/ohlcv',
                     ),
                 ),
             ),
@@ -116,6 +117,52 @@ class trademn extends Exchange {
             'quoteVolume' => $quoteVol,
             'info' => $ticker,
         );
+    }
+
+    public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
+        $response = $this->proxyGetTrademnOhlcv (array(
+            'symbol' => $symbol,
+        ));
+        // {
+        //     "status" => true,
+        //     "code" => "0000",
+        //     "msg" => array(
+        //       "Амжилттай"
+        //     ),
+        //     "data" => {
+        //       "nextPage" => -1,
+        //       "chartData" => array(
+        //         array(
+        //           "time" => 1629216000000,
+        //           "open" => 1.5,
+        //           "high" => 55,
+        //           "low" => 1.5,
+        //           "close" => 6.18,
+        //           "volume" => 633596693.0555251
+        //         ),
+        //     )
+        // }
+        return $this->parse_ohlcvs($response['data']['chartData'], $symbol, $timeframe, $since, $limit);
+    }
+
+    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+        $result = array();
+        for ($i = 0; $i < count($ohlcvs); $i++) {
+            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
+        }
+        $sorted = $this->sort_by($result, 0);
+        return $sorted;
+    }
+
+    public function parse_ohlcv($ohlcv, $market = null) {
+        $r = array();
+        $r[] = intval($ohlcv['time']);
+        $r[] = $ohlcv['open'];
+        $r[] = $ohlcv['high'];
+        $r[] = $ohlcv['low'];
+        $r[] = $ohlcv['close'];
+        $r[] = $ohlcv['volume'];
+        return $r;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {

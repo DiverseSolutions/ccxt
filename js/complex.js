@@ -29,7 +29,7 @@ module.exports = class complex extends Exchange {
                 'fetchDeposits': false,
                 'fetchMarkets': true,
                 'fetchMyTrades': false,
-                'fetchOHLCV': false,
+                'fetchOHLCV': true,
                 'fetchOpenOrders': false,
                 'fetchOrder': false,
                 'fetchOrderBook': false,
@@ -52,6 +52,7 @@ module.exports = class complex extends Exchange {
                 'public': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
                 'market': {
@@ -181,6 +182,59 @@ module.exports = class complex extends Exchange {
             'quoteVolume': quoteVol,
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        const pairs = symbol.split ('/');
+        const base = pairs[0].toUpperCase ();
+        const quote = pairs[1].toUpperCase ();
+        const id = base + '-' + quote;
+        const response = await this.publicGetOhlcv ({
+            'market': id,
+        });
+        // {
+        //     "s": "ok",
+        //     "errmsg": null,
+        //     "t": [
+        //       1663286400,
+        //     ],
+        //     "o": [
+        //         1663286400,
+        //       ],
+        //     "h": [
+        //       1663286400,
+        //     ],
+        //     "l": [
+        //         1663286400,
+        //       ],
+        //     "c": [
+        //       1663286400,
+        //     ],
+        //     "v": [
+        //         1663286400,
+        //       ],
+        // }
+        return this.parseOHLCVS (response, symbol, timeframe, since, limit);
+    }
+
+    parseOHLCVS (ohlcvs, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+        const result = [];
+        for (let i = 0; i < ohlcvs['c'].length; i++) {
+            const ohlcv = [];
+            ohlcv.push (parseInt (ohlcvs['t'][i]) * 1000);
+            ohlcv.push (parseFloat (ohlcvs['o'][i]));
+            ohlcv.push (parseFloat (ohlcvs['h'][i]));
+            ohlcv.push (parseFloat (ohlcvs['l'][i]));
+            ohlcv.push (parseFloat (ohlcvs['c'][i]));
+            ohlcv.push (parseFloat (ohlcvs['v'][i]));
+            result.push (ohlcv);
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        return ohlcv;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

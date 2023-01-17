@@ -65,6 +65,7 @@ class coinhub extends Exchange {
                 'public' => array(
                     'get' => array(
                         'tickers',
+                        'ohlcv',
                     ),
                 ),
             ),
@@ -214,6 +215,59 @@ class coinhub extends Exchange {
             'quoteVolume' => null,
             'info' => $ticker,
         );
+    }
+
+    public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
+        yield $this->load_markets();
+        $market = $this->market($symbol);
+        $response = yield $this->publicGetOhlcv (array(
+            'market' => $market['id'],
+        ));
+        // {
+        //     "code" => 200,
+        //     "message" => null,
+        //     "data" => array(
+        //       [
+        //         1663200000,
+        //         "19.4994",
+        //         "19.499",
+        //         "19.677",
+        //         "18.5",
+        //         "408981.2652",
+        //         "7732079.65670149",
+        //         "CHB/MNT"
+        //       ),
+        // }
+        return $this->parse_ohlcvs($response['data'], $market, $timeframe, $since, $limit);
+    }
+
+    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+        //       array(
+        //         1663200000,
+        //         "19.4994",
+        //         "19.499",
+        //         "19.677",
+        //         "18.5",
+        //         "408981.2652",
+        //         "7732079.65670149",
+        //         "CHB/MNT"
+        //       ),
+        $result = array();
+        for ($i = 0; $i < count($ohlcvs); $i++) {
+            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
+        }
+        $sorted = $this->sort_by($result, 0);
+        return $sorted;
+    }
+
+    public function parse_ohlcv($ohlcv, $market = null) {
+        $ohlcv[0] = intval($ohlcv[0]) * 1000;
+        $ohlcv[1] = floatval($ohlcv[1]);
+        $ohlcv[2] = floatval($ohlcv[2]);
+        $ohlcv[3] = floatval($ohlcv[3]);
+        $ohlcv[4] = floatval($ohlcv[4]);
+        $ohlcv[5] = floatval($ohlcv[5]);
+        return $ohlcv;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {

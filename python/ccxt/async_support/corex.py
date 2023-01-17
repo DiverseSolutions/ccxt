@@ -46,6 +46,7 @@ class corex(Exchange):
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
                     'public': 'https://www.corex.mn/api/v2/peatio/public',
+                    'proxy': 'https://www.corex.mn/api/v2/peatio/public',
                     'market': 'http://52.79.140.119:8000/corex',
                 },
                 'www': 'https://www.corex.mn',
@@ -55,6 +56,12 @@ class corex(Exchange):
                 'public': {
                     'get': [
                         'markets',
+                        'ohlcv',
+                    ],
+                },
+                'proxy': {
+                    'get': [
+                        'ohlcv',
                     ],
                 },
                 'market': {
@@ -203,6 +210,40 @@ class corex(Exchange):
             'quoteVolume': ticker['vol'],
             'info': ticker,
         }
+
+    async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        await self.load_markets()
+        market = self.market(symbol)
+        response = await self.publicGetOhlcv({
+            'market_id': market['id'],
+        })
+        # [
+        #     [
+        #       1663257600,
+        #       19736.5,
+        #       19945.7,
+        #       19446.6,
+        #       19662.1,
+        #       5243.97705169
+        #     ],
+        # ]
+        return self.parse_ohlcvs(response, symbol, timeframe, since, limit)
+
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+        result = []
+        for i in range(0, len(ohlcvs)):
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        ohlcv[0] = int(ohlcv[0]) * 1000
+        ohlcv[1] = float(ohlcv[1])
+        ohlcv[2] = float(ohlcv[2])
+        ohlcv[3] = float(ohlcv[3])
+        ohlcv[4] = float(ohlcv[4])
+        ohlcv[5] = float(ohlcv[5])
+        return ohlcv
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

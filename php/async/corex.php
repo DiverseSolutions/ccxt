@@ -47,6 +47,7 @@ class corex extends Exchange {
                 'logo' => 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api' => array(
                     'public' => 'https://www.corex.mn/api/v2/peatio/public',
+                    'proxy' => 'https://www.corex.mn/api/v2/peatio/public',
                     'market' => 'http://52.79.140.119:8000/corex',
                 ),
                 'www' => 'https://www.corex.mn',
@@ -56,6 +57,12 @@ class corex extends Exchange {
                 'public' => array(
                     'get' => array(
                         'markets',
+                        'ohlcv',
+                    ),
+                ),
+                'proxy' => array(
+                    'get' => array(
+                        'ohlcv',
                     ),
                 ),
                 'market' => array(
@@ -209,6 +216,44 @@ class corex extends Exchange {
             'quoteVolume' => $ticker['vol'],
             'info' => $ticker,
         );
+    }
+
+    public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
+        yield $this->load_markets();
+        $market = $this->market($symbol);
+        $response = yield $this->publicGetOhlcv (array(
+            'market_id' => $market['id'],
+        ));
+        // array(
+        //     array(
+        //       1663257600,
+        //       19736.5,
+        //       19945.7,
+        //       19446.6,
+        //       19662.1,
+        //       5243.97705169
+        //     ),
+        // )
+        return $this->parse_ohlcvs($response, $symbol, $timeframe, $since, $limit);
+    }
+
+    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+        $result = array();
+        for ($i = 0; $i < count($ohlcvs); $i++) {
+            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
+        }
+        $sorted = $this->sort_by($result, 0);
+        return $sorted;
+    }
+
+    public function parse_ohlcv($ohlcv, $market = null) {
+        $ohlcv[0] = intval($ohlcv[0]) * 1000;
+        $ohlcv[1] = floatval($ohlcv[1]);
+        $ohlcv[2] = floatval($ohlcv[2]);
+        $ohlcv[3] = floatval($ohlcv[3]);
+        $ohlcv[4] = floatval($ohlcv[4]);
+        $ohlcv[5] = floatval($ohlcv[5]);
+        return $ohlcv;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {

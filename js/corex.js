@@ -44,6 +44,7 @@ module.exports = class corex extends Exchange {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
                     'public': 'https://www.corex.mn/api/v2/peatio/public',
+                    'proxy': 'https://www.corex.mn/api/v2/peatio/public',
                     'market': 'http://52.79.140.119:8000/corex',
                 },
                 'www': 'https://www.corex.mn',
@@ -53,6 +54,12 @@ module.exports = class corex extends Exchange {
                 'public': {
                     'get': [
                         'markets',
+                        'ohlcv',
+                    ],
+                },
+                'proxy': {
+                    'get': [
+                        'ohlcv',
                     ],
                 },
                 'market': {
@@ -206,6 +213,44 @@ module.exports = class corex extends Exchange {
             'quoteVolume': ticker['vol'],
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const response = await this.publicGetOhlcv ({
+            'market_id': market['id'],
+        });
+        // [
+        //     [
+        //       1663257600,
+        //       19736.5,
+        //       19945.7,
+        //       19446.6,
+        //       19662.1,
+        //       5243.97705169
+        //     ],
+        // ]
+        return this.parseOHLCVs (response, symbol, timeframe, since, limit);
+    }
+
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        const result = [];
+        for (let i = 0; i < ohlcvs.length; i++) {
+            result.push (this.parseOHLCV (ohlcvs[i], market));
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        ohlcv[0] = parseInt (ohlcv[0]) * 1000;
+        ohlcv[1] = parseFloat (ohlcv[1]);
+        ohlcv[2] = parseFloat (ohlcv[2]);
+        ohlcv[3] = parseFloat (ohlcv[3]);
+        ohlcv[4] = parseFloat (ohlcv[4]);
+        ohlcv[5] = parseFloat (ohlcv[5]);
+        return ohlcv;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

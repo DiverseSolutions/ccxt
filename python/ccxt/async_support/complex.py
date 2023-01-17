@@ -31,7 +31,7 @@ class complex(Exchange):
                 'fetchDeposits': False,
                 'fetchMarkets': True,
                 'fetchMyTrades': False,
-                'fetchOHLCV': False,
+                'fetchOHLCV': True,
                 'fetchOpenOrders': False,
                 'fetchOrder': False,
                 'fetchOrderBook': False,
@@ -54,6 +54,7 @@ class complex(Exchange):
                 'public': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
                 'market': {
@@ -179,6 +180,55 @@ class complex(Exchange):
             'quoteVolume': quoteVol,
             'info': ticker,
         }
+
+    async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        pairs = symbol.split('/')
+        base = pairs[0].upper()
+        quote = pairs[1].upper()
+        id = base + '-' + quote
+        response = await self.publicGetOhlcv({
+            'market': id,
+        })
+        # {
+        #     "s": "ok",
+        #     "errmsg": null,
+        #     "t": [
+        #       1663286400,
+        #     ],
+        #     "o": [
+        #         1663286400,
+        #       ],
+        #     "h": [
+        #       1663286400,
+        #     ],
+        #     "l": [
+        #         1663286400,
+        #       ],
+        #     "c": [
+        #       1663286400,
+        #     ],
+        #     "v": [
+        #         1663286400,
+        #       ],
+        # }
+        return self.parse_ohlcvs(response, symbol, timeframe, since, limit)
+
+    def parse_ohlcvs(self, ohlcvs, market=None, timeframe='1d', since=None, limit=None):
+        result = []
+        for i in range(0, len(ohlcvs['c'])):
+            ohlcv = []
+            ohlcv.append(int(ohlcvs['t'][i]) * 1000)
+            ohlcv.append(float(ohlcvs['o'][i]))
+            ohlcv.append(float(ohlcvs['h'][i]))
+            ohlcv.append(float(ohlcvs['l'][i]))
+            ohlcv.append(float(ohlcvs['c'][i]))
+            ohlcv.append(float(ohlcvs['v'][i]))
+            result.append(ohlcv)
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        return ohlcv
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

@@ -59,6 +59,7 @@ class xmeta extends Exchange {
                 'proxy' => array(
                     'get' => array(
                         'tickers',
+                        'ohlcv',
                     ),
                 ),
             ),
@@ -149,6 +150,49 @@ class xmeta extends Exchange {
             'quoteVolume' => $this->safe_number($ticker, 'amount'),
             'info' => $ticker,
         );
+    }
+
+    public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
+        $id = str_replace('/', '_', $symbol);
+        $response = yield $this->proxyGetOhlcv (array(
+            'symbol' => $id,
+        ));
+        // {
+        //     "code" => 0,
+        //     "msg" => "Success",
+        //     "data" => {
+        //       "list" => array(
+        //         [
+        //           "1673913600000",
+        //           "0.0000670000",
+        //           "0.0000690000",
+        //           "0.0000660000",
+        //           "0.0000670000",
+        //           "423001985.1347635700",
+        //           "1673999999999",
+        //           "28336.1027785800",
+        //           "170",
+        //           "164415353.4837635700",
+        //           "11124.6813104000",
+        //           ""
+        //         ),
+        //     }
+        // }
+        return $this->parse_ohlcvs($response['data']['list'], $symbol, $timeframe, $since, $limit);
+    }
+
+    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+        $result = array();
+        for ($i = 0; $i < count($ohlcvs); $i++) {
+            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
+        }
+        $sorted = $this->sort_by($result, 0);
+        return $sorted;
+    }
+
+    public function parse_ohlcv($ohlcv, $market = null) {
+        $ohlcv[0] = intval($ohlcv[0]);
+        return gettype($ohlcv) === 'array' && count(array_filter(array_keys($ohlcv), 'is_string')) == 0 ? mb_substr($ohlcv, 0, 6 - 0) : $ohlcv;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {

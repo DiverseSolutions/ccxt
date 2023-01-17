@@ -64,6 +64,7 @@ class coinhub(Exchange):
                 'public': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
             },
@@ -207,6 +208,55 @@ class coinhub(Exchange):
             'quoteVolume': None,
             'info': ticker,
         }
+
+    def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        self.load_markets()
+        market = self.market(symbol)
+        response = self.publicGetOhlcv({
+            'market': market['id'],
+        })
+        # {
+        #     "code": 200,
+        #     "message": null,
+        #     "data": [
+        #       [
+        #         1663200000,
+        #         "19.4994",
+        #         "19.499",
+        #         "19.677",
+        #         "18.5",
+        #         "408981.2652",
+        #         "7732079.65670149",
+        #         "CHB/MNT"
+        #       ],
+        # }
+        return self.parse_ohlcvs(response['data'], market, timeframe, since, limit)
+
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+        #       [
+        #         1663200000,
+        #         "19.4994",
+        #         "19.499",
+        #         "19.677",
+        #         "18.5",
+        #         "408981.2652",
+        #         "7732079.65670149",
+        #         "CHB/MNT"
+        #       ],
+        result = []
+        for i in range(0, len(ohlcvs)):
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        ohlcv[0] = int(ohlcv[0]) * 1000
+        ohlcv[1] = float(ohlcv[1])
+        ohlcv[2] = float(ohlcv[2])
+        ohlcv[3] = float(ohlcv[3])
+        ohlcv[4] = float(ohlcv[4])
+        ohlcv[5] = float(ohlcv[5])
+        return ohlcv
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

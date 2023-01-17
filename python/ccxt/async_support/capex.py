@@ -54,6 +54,7 @@ class capex(Exchange):
                 'proxy': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
             },
@@ -138,6 +139,47 @@ class capex(Exchange):
             'quoteVolume': ticker['base_volume'],
             'info': ticker,
         }
+
+    async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        pairs = symbol.split('/')
+        base = pairs[0]
+        quote = pairs[1]
+        response = await self.proxyGetOhlcv({
+            'base_currency': base,
+            'quote_currency': quote,
+        })
+        # {
+        #     "status": "Success",
+        #     "errorMessage": null,
+        #     "data": [
+        #       {
+        #         "time": 1663113600000,
+        #         "open": 0.025,
+        #         "close": 0.025,
+        #         "high": 0.025,
+        #         "low": 0.025,
+        #         "volume": 0
+        #       },
+        #     ]
+        # }
+        return self.parse_ohlcvs(response['data'], symbol, timeframe, since, limit)
+
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+        result = []
+        for i in range(0, len(ohlcvs)):
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        r = []
+        r.append(int(ohlcv['time']))
+        r.append(float(ohlcv['open']))
+        r.append(float(ohlcv['high']))
+        r.append(float(ohlcv['low']))
+        r.append(float(ohlcv['close']))
+        r.append(float(ohlcv['volume']))
+        return r
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

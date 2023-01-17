@@ -32,7 +32,7 @@ class complex extends Exchange {
                 'fetchDeposits' => false,
                 'fetchMarkets' => true,
                 'fetchMyTrades' => false,
-                'fetchOHLCV' => false,
+                'fetchOHLCV' => true,
                 'fetchOpenOrders' => false,
                 'fetchOrder' => false,
                 'fetchOrderBook' => false,
@@ -55,6 +55,7 @@ class complex extends Exchange {
                 'public' => array(
                     'get' => array(
                         'tickers',
+                        'ohlcv',
                     ),
                 ),
                 'market' => array(
@@ -184,6 +185,59 @@ class complex extends Exchange {
             'quoteVolume' => $quoteVol,
             'info' => $ticker,
         );
+    }
+
+    public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
+        $pairs = explode('/', $symbol);
+        $base = strtoupper($pairs[0]);
+        $quote = strtoupper($pairs[1]);
+        $id = $base . '-' . $quote;
+        $response = $this->publicGetOhlcv (array(
+            'market' => $id,
+        ));
+        // {
+        //     "s" => "ok",
+        //     "errmsg" => null,
+        //     "t" => array(
+        //       1663286400,
+        //     ),
+        //     "o" => array(
+        //         1663286400,
+        //       ),
+        //     "h" => array(
+        //       1663286400,
+        //     ),
+        //     "l" => array(
+        //         1663286400,
+        //       ),
+        //     "c" => array(
+        //       1663286400,
+        //     ),
+        //     "v" => array(
+        //         1663286400,
+        //       ),
+        // }
+        return $this->parse_ohlcvs($response, $symbol, $timeframe, $since, $limit);
+    }
+
+    public function parse_ohlcvs($ohlcvs, $market = null, $timeframe = '1d', $since = null, $limit = null) {
+        $result = array();
+        for ($i = 0; $i < count($ohlcvs['c']); $i++) {
+            $ohlcv = array();
+            $ohlcv[] = intval($ohlcvs['t'][$i]) * 1000;
+            $ohlcv[] = floatval($ohlcvs['o'][$i]);
+            $ohlcv[] = floatval($ohlcvs['h'][$i]);
+            $ohlcv[] = floatval($ohlcvs['l'][$i]);
+            $ohlcv[] = floatval($ohlcvs['c'][$i]);
+            $ohlcv[] = floatval($ohlcvs['v'][$i]);
+            $result[] = $ohlcv;
+        }
+        $sorted = $this->sort_by($result, 0);
+        return $sorted;
+    }
+
+    public function parse_ohlcv($ohlcv, $market = null) {
+        return $ohlcv;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {

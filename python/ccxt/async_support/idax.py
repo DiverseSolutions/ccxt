@@ -55,6 +55,7 @@ class idax(Exchange):
                     'get': [
                         'tickers',
                         'markets',
+                        'ohlcv',
                     ],
                 },
             },
@@ -278,6 +279,43 @@ class idax(Exchange):
             'quoteVolume': quoteVol,
             'info': ticker,
         }
+
+    async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        await self.load_markets()
+        market = self.market(symbol)
+        response = await self.proxyGetOhlcv({
+            'symbol': market['id'],
+        })
+        # [
+        #     {
+        #       "high": "23",
+        #       "vol": "550941.42632686",
+        #       "low": "21.779",
+        #       "idx": 1673798400000,
+        #       "close": "22.4699",
+        #       "open": "21.779"
+        #     },
+        # ]
+        return self.parse_ohlcvs(response, market, timeframe, since, limit)
+
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+        result = []
+        if not len(ohlcvs):
+            return []
+        for i in range(0, len(ohlcvs)):
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        r = []
+        r.append(int(ohlcv['idx']))
+        r.append(ohlcv['open'])
+        r.append(ohlcv['high'])
+        r.append(ohlcv['low'])
+        r.append(ohlcv['close'])
+        r.append(ohlcv['vol'])
+        return r
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

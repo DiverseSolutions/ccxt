@@ -53,6 +53,7 @@ module.exports = class trademn extends Exchange {
                 'proxy': {
                     'get': [
                         'trademn/tickers',
+                        'trademn/ohlcv',
                     ],
                 },
             },
@@ -114,6 +115,52 @@ module.exports = class trademn extends Exchange {
             'quoteVolume': quoteVol,
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        const response = await this.proxyGetTrademnOhlcv ({
+            'symbol': symbol,
+        });
+        // {
+        //     "status": true,
+        //     "code": "0000",
+        //     "msg": [
+        //       "Амжилттай"
+        //     ],
+        //     "data": {
+        //       "nextPage": -1,
+        //       "chartData": [
+        //         {
+        //           "time": 1629216000000,
+        //           "open": 1.5,
+        //           "high": 55,
+        //           "low": 1.5,
+        //           "close": 6.18,
+        //           "volume": 633596693.0555251
+        //         },
+        //     ]
+        // }
+        return this.parseOHLCVs (response['data']['chartData'], symbol, timeframe, since, limit);
+    }
+
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        const result = [];
+        for (let i = 0; i < ohlcvs.length; i++) {
+            result.push (this.parseOHLCV (ohlcvs[i], market));
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        const r = [];
+        r.push (parseInt (ohlcv['time']));
+        r.push (ohlcv['open']);
+        r.push (ohlcv['high']);
+        r.push (ohlcv['low']);
+        r.push (ohlcv['close']);
+        r.push (ohlcv['volume']);
+        return r;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

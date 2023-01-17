@@ -56,6 +56,7 @@ module.exports = class xmeta extends Exchange {
                 'proxy': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
             },
@@ -146,6 +147,49 @@ module.exports = class xmeta extends Exchange {
             'quoteVolume': this.safeNumber (ticker, 'amount'),
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        const id = symbol.replace ('/', '_');
+        const response = await this.proxyGetOhlcv ({
+            'symbol': id,
+        });
+        // {
+        //     "code": 0,
+        //     "msg": "Success",
+        //     "data": {
+        //       "list": [
+        //         [
+        //           "1673913600000",
+        //           "0.0000670000",
+        //           "0.0000690000",
+        //           "0.0000660000",
+        //           "0.0000670000",
+        //           "423001985.1347635700",
+        //           "1673999999999",
+        //           "28336.1027785800",
+        //           "170",
+        //           "164415353.4837635700",
+        //           "11124.6813104000",
+        //           ""
+        //         ],
+        //     }
+        // }
+        return this.parseOHLCVs (response['data']['list'], symbol, timeframe, since, limit);
+    }
+
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        const result = [];
+        for (let i = 0; i < ohlcvs.length; i++) {
+            result.push (this.parseOHLCV (ohlcvs[i], market));
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        ohlcv[0] = parseInt (ohlcv[0]);
+        return Array.isArray (ohlcv) ? ohlcv.slice (0, 6) : ohlcv;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

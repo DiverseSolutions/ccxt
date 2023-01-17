@@ -58,6 +58,7 @@ class xmeta(Exchange):
                 'proxy': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
             },
@@ -146,6 +147,45 @@ class xmeta(Exchange):
             'quoteVolume': self.safe_number(ticker, 'amount'),
             'info': ticker,
         }
+
+    async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        id = symbol.replace('/', '_')
+        response = await self.proxyGetOhlcv({
+            'symbol': id,
+        })
+        # {
+        #     "code": 0,
+        #     "msg": "Success",
+        #     "data": {
+        #       "list": [
+        #         [
+        #           "1673913600000",
+        #           "0.0000670000",
+        #           "0.0000690000",
+        #           "0.0000660000",
+        #           "0.0000670000",
+        #           "423001985.1347635700",
+        #           "1673999999999",
+        #           "28336.1027785800",
+        #           "170",
+        #           "164415353.4837635700",
+        #           "11124.6813104000",
+        #           ""
+        #         ],
+        #     }
+        # }
+        return self.parse_ohlcvs(response['data']['list'], symbol, timeframe, since, limit)
+
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+        result = []
+        for i in range(0, len(ohlcvs)):
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        ohlcv[0] = int(ohlcv[0])
+        return ohlcv[0:6] if isinstance(ohlcv, list) else ohlcv
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

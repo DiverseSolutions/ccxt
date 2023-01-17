@@ -62,6 +62,7 @@ module.exports = class coinhub extends Exchange {
                 'public': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
             },
@@ -211,6 +212,59 @@ module.exports = class coinhub extends Exchange {
             'quoteVolume': undefined,
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const response = await this.publicGetOhlcv ({
+            'market': market['id'],
+        });
+        // {
+        //     "code": 200,
+        //     "message": null,
+        //     "data": [
+        //       [
+        //         1663200000,
+        //         "19.4994",
+        //         "19.499",
+        //         "19.677",
+        //         "18.5",
+        //         "408981.2652",
+        //         "7732079.65670149",
+        //         "CHB/MNT"
+        //       ],
+        // }
+        return this.parseOHLCVs (response['data'], market, timeframe, since, limit);
+    }
+
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //       [
+        //         1663200000,
+        //         "19.4994",
+        //         "19.499",
+        //         "19.677",
+        //         "18.5",
+        //         "408981.2652",
+        //         "7732079.65670149",
+        //         "CHB/MNT"
+        //       ],
+        const result = [];
+        for (let i = 0; i < ohlcvs.length; i++) {
+            result.push (this.parseOHLCV (ohlcvs[i], market));
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        ohlcv[0] = parseInt (ohlcv[0]) * 1000;
+        ohlcv[1] = parseFloat (ohlcv[1]);
+        ohlcv[2] = parseFloat (ohlcv[2]);
+        ohlcv[3] = parseFloat (ohlcv[3]);
+        ohlcv[4] = parseFloat (ohlcv[4]);
+        ohlcv[5] = parseFloat (ohlcv[5]);
+        return ohlcv;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

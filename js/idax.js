@@ -53,6 +53,7 @@ module.exports = class idax extends Exchange {
                     'get': [
                         'tickers',
                         'markets',
+                        'ohlcv',
                     ],
                 },
             },
@@ -284,6 +285,48 @@ module.exports = class idax extends Exchange {
             'quoteVolume': quoteVol,
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const response = await this.proxyGetOhlcv ({
+            'symbol': market['id'],
+        });
+        // [
+        //     {
+        //       "high": "23",
+        //       "vol": "550941.42632686",
+        //       "low": "21.779",
+        //       "idx": 1673798400000,
+        //       "close": "22.4699",
+        //       "open": "21.779"
+        //     },
+        // ]
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
+    }
+
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        const result = [];
+        if (!ohlcvs.length) {
+            return [];
+        }
+        for (let i = 0; i < ohlcvs.length; i++) {
+            result.push (this.parseOHLCV (ohlcvs[i], market));
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        const r = [];
+        r.push (parseInt (ohlcv['idx']));
+        r.push (ohlcv['open']);
+        r.push (ohlcv['high']);
+        r.push (ohlcv['low']);
+        r.push (ohlcv['close']);
+        r.push (ohlcv['vol']);
+        return r;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

@@ -52,6 +52,7 @@ module.exports = class capex extends Exchange {
                 'proxy': {
                     'get': [
                         'tickers',
+                        'ohlcv',
                     ],
                 },
             },
@@ -138,6 +139,51 @@ module.exports = class capex extends Exchange {
             'quoteVolume': ticker['base_volume'],
             'info': ticker,
         };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        const pairs = symbol.split ('/');
+        const base = pairs[0];
+        const quote = pairs[1];
+        const response = await this.proxyGetOhlcv ({
+            'base_currency': base,
+            'quote_currency': quote,
+        });
+        // {
+        //     "status": "Success",
+        //     "errorMessage": null,
+        //     "data": [
+        //       {
+        //         "time": 1663113600000,
+        //         "open": 0.025,
+        //         "close": 0.025,
+        //         "high": 0.025,
+        //         "low": 0.025,
+        //         "volume": 0
+        //       },
+        //     ]
+        // }
+        return this.parseOHLCVs (response['data'], symbol, timeframe, since, limit);
+    }
+
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        const result = [];
+        for (let i = 0; i < ohlcvs.length; i++) {
+            result.push (this.parseOHLCV (ohlcvs[i], market));
+        }
+        const sorted = this.sortBy (result, 0);
+        return sorted;
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        const r = [];
+        r.push (parseInt (ohlcv['time']));
+        r.push (parseFloat (ohlcv['open']));
+        r.push (parseFloat (ohlcv['high']));
+        r.push (parseFloat (ohlcv['low']));
+        r.push (parseFloat (ohlcv['close']));
+        r.push (parseFloat (ohlcv['volume']));
+        return r;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

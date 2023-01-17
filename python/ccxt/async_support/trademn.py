@@ -54,6 +54,7 @@ class trademn(Exchange):
                 'proxy': {
                     'get': [
                         'trademn/tickers',
+                        'trademn/ohlcv',
                     ],
                 },
             },
@@ -112,6 +113,48 @@ class trademn(Exchange):
             'quoteVolume': quoteVol,
             'info': ticker,
         }
+
+    async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
+        response = await self.proxyGetTrademnOhlcv({
+            'symbol': symbol,
+        })
+        # {
+        #     "status": True,
+        #     "code": "0000",
+        #     "msg": [
+        #       "Амжилттай"
+        #     ],
+        #     "data": {
+        #       "nextPage": -1,
+        #       "chartData": [
+        #         {
+        #           "time": 1629216000000,
+        #           "open": 1.5,
+        #           "high": 55,
+        #           "low": 1.5,
+        #           "close": 6.18,
+        #           "volume": 633596693.0555251
+        #         },
+        #     ]
+        # }
+        return self.parse_ohlcvs(response['data']['chartData'], symbol, timeframe, since, limit)
+
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+        result = []
+        for i in range(0, len(ohlcvs)):
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
+        sorted = self.sort_by(result, 0)
+        return sorted
+
+    def parse_ohlcv(self, ohlcv, market=None):
+        r = []
+        r.append(int(ohlcv['time']))
+        r.append(ohlcv['open'])
+        r.append(ohlcv['high'])
+        r.append(ohlcv['low'])
+        r.append(ohlcv['close'])
+        r.append(ohlcv['volume'])
+        return r
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

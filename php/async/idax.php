@@ -56,6 +56,7 @@ class idax extends Exchange {
                     'get' => array(
                         'tickers',
                         'markets',
+                        'ohlcv',
                     ),
                 ),
             ),
@@ -287,6 +288,48 @@ class idax extends Exchange {
             'quoteVolume' => $quoteVol,
             'info' => $ticker,
         );
+    }
+
+    public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
+        yield $this->load_markets();
+        $market = $this->market($symbol);
+        $response = yield $this->proxyGetOhlcv (array(
+            'symbol' => $market['id'],
+        ));
+        // array(
+        //     array(
+        //       "high" => "23",
+        //       "vol" => "550941.42632686",
+        //       "low" => "21.779",
+        //       "idx" => 1673798400000,
+        //       "close" => "22.4699",
+        //       "open" => "21.779"
+        //     ),
+        // )
+        return $this->parse_ohlcvs($response, $market, $timeframe, $since, $limit);
+    }
+
+    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+        $result = array();
+        if (strlen(!$ohlcvs)) {
+            return array();
+        }
+        for ($i = 0; $i < count($ohlcvs); $i++) {
+            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
+        }
+        $sorted = $this->sort_by($result, 0);
+        return $sorted;
+    }
+
+    public function parse_ohlcv($ohlcv, $market = null) {
+        $r = array();
+        $r[] = intval($ohlcv['idx']);
+        $r[] = $ohlcv['open'];
+        $r[] = $ohlcv['high'];
+        $r[] = $ohlcv['low'];
+        $r[] = $ohlcv['close'];
+        $r[] = $ohlcv['vol'];
+        return $r;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {
