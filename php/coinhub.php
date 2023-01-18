@@ -261,13 +261,14 @@ class coinhub extends Exchange {
     }
 
     public function parse_ohlcv($ohlcv, $market = null) {
-        $ohlcv[0] = intval($ohlcv[0]) * 1000;
-        $ohlcv[1] = floatval($ohlcv[1]);
-        $ohlcv[2] = floatval($ohlcv[2]);
-        $ohlcv[3] = floatval($ohlcv[3]);
-        $ohlcv[4] = floatval($ohlcv[4]);
-        $ohlcv[5] = floatval($ohlcv[5]);
-        return $ohlcv;
+        $r = array();
+        $r[] = intval($ohlcv[0]) * 1000;
+        $r[] = floatval($ohlcv[1]);
+        $r[] = floatval($ohlcv[2]);
+        $r[] = floatval($ohlcv[3]);
+        $r[] = floatval($ohlcv[4]);
+        $r[] = floatval($ohlcv[5]);
+        return $r;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {

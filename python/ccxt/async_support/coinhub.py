@@ -250,13 +250,14 @@ class coinhub(Exchange):
         return sorted
 
     def parse_ohlcv(self, ohlcv, market=None):
-        ohlcv[0] = int(ohlcv[0]) * 1000
-        ohlcv[1] = float(ohlcv[1])
-        ohlcv[2] = float(ohlcv[2])
-        ohlcv[3] = float(ohlcv[3])
-        ohlcv[4] = float(ohlcv[4])
-        ohlcv[5] = float(ohlcv[5])
-        return ohlcv
+        r = []
+        r.append(int(ohlcv[0]) * 1000)
+        r.append(float(ohlcv[1]))
+        r.append(float(ohlcv[2]))
+        r.append(float(ohlcv[3]))
+        r.append(float(ohlcv[4]))
+        r.append(float(ohlcv[5]))
+        return r
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

@@ -258,13 +258,14 @@ module.exports = class coinhub extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined) {
-        ohlcv[0] = parseInt (ohlcv[0]) * 1000;
-        ohlcv[1] = parseFloat (ohlcv[1]);
-        ohlcv[2] = parseFloat (ohlcv[2]);
-        ohlcv[3] = parseFloat (ohlcv[3]);
-        ohlcv[4] = parseFloat (ohlcv[4]);
-        ohlcv[5] = parseFloat (ohlcv[5]);
-        return ohlcv;
+        const r = [];
+        r.push (parseInt (ohlcv[0]) * 1000);
+        r.push (parseFloat (ohlcv[1]));
+        r.push (parseFloat (ohlcv[2]));
+        r.push (parseFloat (ohlcv[3]));
+        r.push (parseFloat (ohlcv[4]));
+        r.push (parseFloat (ohlcv[5]));
+        return r;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
