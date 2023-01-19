@@ -59,6 +59,23 @@ class idax(Exchange):
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '1min',
+                '3m': None,
+                '5m': '5min',
+                '15m': '15min',
+                '30m': '30min',
+                '1h': '60min',
+                '2h': None,
+                '4h': None,
+                '6h': None,
+                '8h': None,
+                '12h': None,
+                '1d': '1day',
+                '3d': None,
+                '1w': '1week',
+                '1M': '1month',
+            },
         })
 
     def fetch_markets(self, params={}):
@@ -283,9 +300,20 @@ class idax(Exchange):
     def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
         self.load_markets()
         market = self.market(symbol)
-        response = self.proxyGetOhlcv({
+        request = {
             'symbol': market['id'],
-        })
+            'interval': self.timeframes[timeframe],
+        }
+        if since is None:
+            request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+        else:
+            request['start'] = since
+        if limit is None:
+            request['end'] = int(self.milliseconds() / 1000)
+        else:
+            duration = self.parse_timeframe(timeframe)
+            request['end'] = int(self.sum(request['start'], limit * duration))
+        response = self.proxyGetOhlcv(request)
         # [
         #     {
         #         "amount": 109411355.9396824,

@@ -57,6 +57,23 @@ module.exports = class idax extends Exchange {
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '1min',
+                '3m': undefined,
+                '5m': '5min',
+                '15m': '15min',
+                '30m': '30min',
+                '1h': '60min',
+                '2h': undefined,
+                '4h': undefined,
+                '6h': undefined,
+                '8h': undefined,
+                '12h': undefined,
+                '1d': '1day',
+                '3d': undefined,
+                '1w': '1week',
+                '1M': '1month',
+            },
         });
     }
 
@@ -290,9 +307,22 @@ module.exports = class idax extends Exchange {
     async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const response = await this.proxyGetOhlcv ({
+        const request = {
             'symbol': market['id'],
-        });
+            'interval': this.timeframes[timeframe],
+        };
+        if (since === undefined) {
+            request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            request['start'] = since;
+        }
+        if (limit === undefined) {
+            request['end'] = parseInt (this.milliseconds() / 1000);
+        } else {
+            const duration = this.parseTimeframe (timeframe);
+            request['end'] = parseInt (this.sum(request['start'], limit * duration));
+        }
+        const response = await this.proxyGetOhlcv (request);
         // [
         //     {
         //         "amount": 109411355.9396824,

@@ -60,6 +60,23 @@ class idax extends Exchange {
                     ),
                 ),
             ),
+            'timeframes' => array(
+                '1m' => '1min',
+                '3m' => null,
+                '5m' => '5min',
+                '15m' => '15min',
+                '30m' => '30min',
+                '1h' => '60min',
+                '2h' => null,
+                '4h' => null,
+                '6h' => null,
+                '8h' => null,
+                '12h' => null,
+                '1d' => '1day',
+                '3d' => null,
+                '1w' => '1week',
+                '1M' => '1month',
+            ),
         ));
     }
 
@@ -293,9 +310,22 @@ class idax extends Exchange {
     public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
         $this->load_markets();
         $market = $this->market($symbol);
-        $response = $this->proxyGetOhlcv (array(
+        $request = array(
             'symbol' => $market['id'],
-        ));
+            'interval' => $this->timeframes[$timeframe],
+        );
+        if ($since === null) {
+            $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            $request['start'] = $since;
+        }
+        if ($limit === null) {
+            $request['end'] = intval($this->milliseconds() / 1000);
+        } else {
+            $duration = $this->parse_timeframe($timeframe);
+            $request['end'] = intval($this->sum($request['start'], $limit * $duration));
+        }
+        $response = $this->proxyGetOhlcv ($request);
         // array(
         //     {
         //         "amount" => 109411355.9396824,
