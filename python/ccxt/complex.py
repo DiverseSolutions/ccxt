@@ -63,6 +63,23 @@ class complex(Exchange):
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '1',
+                '3m': None,
+                '5m': '5',
+                '15m': None,
+                '30m': None,
+                '1h': None,
+                '2h': None,
+                '4h': None,
+                '6h': None,
+                '8h': None,
+                '12h': None,
+                '1d': '1D',
+                '3d': None,
+                '1w': None,
+                '1M': None,
+            },
         })
 
     def fetch_markets(self, params={}):
@@ -186,9 +203,20 @@ class complex(Exchange):
         base = pairs[0].upper()
         quote = pairs[1].upper()
         id = base + '-' + quote
+        request = {}
         response = self.publicGetOhlcv({
             'market': id,
+            'resolution': self.timeframes[timeframe]
         })
+        if since is None:
+            request['from'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+        else:
+            request['from'] = since
+        if limit is None:
+            request['to'] = int(self.milliseconds() / 1000)
+        else:
+            duration = self.parse_timeframe(timeframe)
+            request['to'] = int(self.sum(request['from'], limit * duration))
         # {
         #     "s": "ok",
         #     "errmsg": null,

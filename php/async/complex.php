@@ -64,6 +64,23 @@ class complex extends Exchange {
                     ),
                 ),
             ),
+            'timeframes' => array(
+                '1m' => '1',
+                '3m' => null,
+                '5m' => '5',
+                '15m' => null,
+                '30m' => null,
+                '1h' => null,
+                '2h' => null,
+                '4h' => null,
+                '6h' => null,
+                '8h' => null,
+                '12h' => null,
+                '1d' => '1D',
+                '3d' => null,
+                '1w' => null,
+                '1M' => null,
+            ),
         ));
     }
 
@@ -192,9 +209,22 @@ class complex extends Exchange {
         $base = strtoupper($pairs[0]);
         $quote = strtoupper($pairs[1]);
         $id = $base . '-' . $quote;
+        $request = array();
         $response = yield $this->publicGetOhlcv (array(
             'market' => $id,
+            'resolution' => $this->timeframes[$timeframe]
         ));
+        if ($since === null) {
+            $request['from'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            $request['from'] = $since;
+        }
+        if ($limit === null) {
+            $request['to'] = intval($this->milliseconds() / 1000);
+        } else {
+            $duration = $this->parse_timeframe($timeframe);
+            $request['to'] = intval($this->sum($request['from'], $limit * $duration));
+        }
         // {
         //     "s" => "ok",
         //     "errmsg" => null,

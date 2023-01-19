@@ -61,6 +61,23 @@ module.exports = class complex extends Exchange {
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '1',
+                '3m': undefined,
+                '5m': '5',
+                '15m': undefined,
+                '30m': undefined,
+                '1h': undefined,
+                '2h': undefined,
+                '4h': undefined,
+                '6h': undefined,
+                '8h': undefined,
+                '12h': undefined,
+                '1d': '1D',
+                '3d': undefined,
+                '1w': undefined,
+                '1M': undefined,
+            },
         });
     }
 
@@ -189,9 +206,22 @@ module.exports = class complex extends Exchange {
         const base = pairs[0].toUpperCase ();
         const quote = pairs[1].toUpperCase ();
         const id = base + '-' + quote;
+        const request = {};
         const response = await this.publicGetOhlcv ({
             'market': id,
+            'resolution': this.timeframes[timeframe]
         });
+        if (since === undefined) {
+            request['from'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            request['from'] = since;
+        }
+        if (limit === undefined) {
+            request['to'] = parseInt (this.milliseconds() / 1000);
+        } else {
+            const duration = this.parseTimeframe (timeframe);
+            request['to'] = parseInt (this.sum(request['from'], limit * duration));
+        }
         // {
         //     "s": "ok",
         //     "errmsg": null,

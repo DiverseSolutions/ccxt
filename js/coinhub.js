@@ -66,6 +66,15 @@ module.exports = class coinhub extends Exchange {
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '60',
+                '5m': '300',
+                '15m': '900',
+                '30m': '1800',
+                '1h': '3600',
+                '4h': '14400',
+                '1d': '86400',
+            },
         });
     }
 
@@ -217,9 +226,22 @@ module.exports = class coinhub extends Exchange {
     async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const response = await this.publicGetOhlcv ({
+        const request = {
             'market': market['id'],
-        });
+            'interval': this.timeframes[timeframe],
+        };
+        if (since === undefined) {
+            request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            request['start'] = since;
+        }
+        if (limit === undefined) {
+            request['end'] = parseInt (this.milliseconds() / 1000);
+        } else {
+            const duration = this.parseTimeframe (timeframe);
+            request['end'] = parseInt (this.sum(request['start'], limit * duration));
+        }
+        const response = await this.publicGetOhlcv (request);
         // {
         //     "code": 200,
         //     "message": null,

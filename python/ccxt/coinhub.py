@@ -68,6 +68,15 @@ class coinhub(Exchange):
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '60',
+                '5m': '300',
+                '15m': '900',
+                '30m': '1800',
+                '1h': '3600',
+                '4h': '14400',
+                '1d': '86400',
+            },
         })
 
     def fetch_markets(self, params={}):
@@ -212,9 +221,20 @@ class coinhub(Exchange):
     def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
         self.load_markets()
         market = self.market(symbol)
-        response = self.publicGetOhlcv({
+        request = {
             'market': market['id'],
-        })
+            'interval': self.timeframes[timeframe],
+        }
+        if since is None:
+            request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+        else:
+            request['start'] = since
+        if limit is None:
+            request['end'] = int(self.milliseconds() / 1000)
+        else:
+            duration = self.parse_timeframe(timeframe)
+            request['end'] = int(self.sum(request['start'], limit * duration))
+        response = self.publicGetOhlcv(request)
         # {
         #     "code": 200,
         #     "message": null,
