@@ -59,7 +59,6 @@ class capex extends Exchange {
                     ),
                 ),
             ),
-            a => ['1', '5', '15', '60', '240', '1440'],
             'timeframes' => array(
                 '1m' => '1',
                 '5m' => '5',
