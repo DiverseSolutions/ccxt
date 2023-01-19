@@ -155,6 +155,7 @@ class capex(Exchange):
         request = {
             'base_currency': base,
             'quote_currency': quote,
+            'interval': self.timeframes[timeframe],
         }
         if since is None:
             request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)

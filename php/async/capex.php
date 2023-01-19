@@ -159,6 +159,7 @@ class capex extends Exchange {
         $request = array(
             'base_currency' => $base,
             'quote_currency' => $quote,
+            'interval' => $this->timeframes[$timeframe],
         );
         if ($since === null) {
             $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);

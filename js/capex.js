@@ -156,6 +156,7 @@ module.exports = class capex extends Exchange {
         const request = {
             'base_currency': base,
             'quote_currency': quote,
+            'interval': this.timeframes[timeframe],
         };
         if (since === undefined) {
             request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
