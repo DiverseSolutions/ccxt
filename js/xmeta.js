@@ -214,11 +214,6 @@ module.exports = class xmeta extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined) {
         ohlcv[0] = parseInt (ohlcv[0]);
-        ohlcv[1] = parseInt (ohlcv[1]);
-        ohlcv[2] = parseInt (ohlcv[2]);
-        ohlcv[3] = parseInt (ohlcv[3]);
-        ohlcv[4] = parseInt (ohlcv[4]);
-        ohlcv[5] = parseInt (ohlcv[5]);
         return Array.isArray (ohlcv) ? ohlcv.slice (0, 6) : ohlcv;
     }
 

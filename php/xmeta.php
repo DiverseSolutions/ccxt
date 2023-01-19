@@ -217,11 +217,6 @@ class xmeta extends Exchange {
 
     public function parse_ohlcv($ohlcv, $market = null) {
         $ohlcv[0] = intval($ohlcv[0]);
-        $ohlcv[1] = intval($ohlcv[1]);
-        $ohlcv[2] = intval($ohlcv[2]);
-        $ohlcv[3] = intval($ohlcv[3]);
-        $ohlcv[4] = intval($ohlcv[4]);
-        $ohlcv[5] = intval($ohlcv[5]);
         return gettype($ohlcv) === 'array' && count(array_filter(array_keys($ohlcv), 'is_string')) == 0 ? mb_substr($ohlcv, 0, 6 - 0) : $ohlcv;
     }
 
