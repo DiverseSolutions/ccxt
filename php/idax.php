@@ -297,14 +297,17 @@ class idax extends Exchange {
             'symbol' => $market['id'],
         ));
         // array(
-        //     array(
-        //       "high" => "23",
-        //       "vol" => "550941.42632686",
-        //       "low" => "21.779",
-        //       "idx" => 1673798400000,
-        //       "close" => "22.4699",
-        //       "open" => "21.779"
-        //     ),
+        //     {
+        //         "amount" => 109411355.9396824,
+        //         "close" => 19269.45,
+        //         "ds" => "2022-10-10 00:00:00",
+        //         "high" => 19552.87,
+        //         "id" => 1665331200,
+        //         "low" => 19130.39,
+        //         "open" => 19534.96,
+        //         "tradeId" => 0,
+        //         "vol" => 5645.98794634
+        //     }
         // )
         return $this->parse_ohlcvs($response, $market, $timeframe, $since, $limit);
     }
@@ -323,7 +326,7 @@ class idax extends Exchange {
 
     public function parse_ohlcv($ohlcv, $market = null) {
         $r = array();
-        $r[] = intval($ohlcv['idx']);
+        $r[] = intval($ohlcv['id']);
         $r[] = $ohlcv['open'];
         $r[] = $ohlcv['high'];
         $r[] = $ohlcv['low'];

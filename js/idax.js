@@ -295,13 +295,16 @@ module.exports = class idax extends Exchange {
         });
         // [
         //     {
-        //       "high": "23",
-        //       "vol": "550941.42632686",
-        //       "low": "21.779",
-        //       "idx": 1673798400000,
-        //       "close": "22.4699",
-        //       "open": "21.779"
-        //     },
+        //         "amount": 109411355.9396824,
+        //         "close": 19269.45,
+        //         "ds": "2022-10-10 00:00:00",
+        //         "high": 19552.87,
+        //         "id": 1665331200,
+        //         "low": 19130.39,
+        //         "open": 19534.96,
+        //         "tradeId": 0,
+        //         "vol": 5645.98794634
+        //     }
         // ]
         return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
@@ -320,7 +323,7 @@ module.exports = class idax extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined) {
         const r = [];
-        r.push (parseInt (ohlcv['idx']));
+        r.push (parseInt (ohlcv['id']));
         r.push (ohlcv['open']);
         r.push (ohlcv['high']);
         r.push (ohlcv['low']);
