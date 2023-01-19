@@ -59,6 +59,15 @@ class capex extends Exchange {
                     ),
                 ),
             ),
+            a => ['1', '5', '15', '60', '240', '1440'],
+            'timeframes' => array(
+                '1m' => '1',
+                '5m' => '5',
+                '15m' => '15',
+                '1h' => '60',
+                '4h' => '240',
+                '1d' => '1440',
+            ),
         ));
     }
 
@@ -148,10 +157,22 @@ class capex extends Exchange {
         $pairs = explode('/', $symbol);
         $base = $pairs[0];
         $quote = $pairs[1];
-        $response = yield $this->proxyGetOhlcv (array(
+        $request = array(
             'base_currency' => $base,
             'quote_currency' => $quote,
-        ));
+        );
+        if ($since === null) {
+            $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            $request['start'] = $since;
+        }
+        if ($limit === null) {
+            $request['end'] = intval($this->milliseconds() / 1000);
+        } else {
+            $duration = $this->parse_timeframe($timeframe);
+            $request['end'] = intval($this->sum($request['start'], $limit * $duration));
+        }
+        $response = yield $this->proxyGetOhlcv ($request);
         // {
         //     "status" => "Success",
         //     "errorMessage" => null,

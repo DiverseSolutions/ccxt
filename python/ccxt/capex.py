@@ -58,6 +58,15 @@ class capex(Exchange):
                     ],
                 },
             },
+            a: ['1', '5', '15', '60', '240', '1440'],
+            'timeframes': {
+                '1m': '1',
+                '5m': '5',
+                '15m': '15',
+                '1h': '60',
+                '4h': '240',
+                '1d': '1440',
+            },
         })
 
     def fetch_tickers(self, symbols=None, params={}):
@@ -144,10 +153,20 @@ class capex(Exchange):
         pairs = symbol.split('/')
         base = pairs[0]
         quote = pairs[1]
-        response = self.proxyGetOhlcv({
+        request = {
             'base_currency': base,
             'quote_currency': quote,
-        })
+        }
+        if since is None:
+            request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+        else:
+            request['start'] = since
+        if limit is None:
+            request['end'] = int(self.milliseconds() / 1000)
+        else:
+            duration = self.parse_timeframe(timeframe)
+            request['end'] = int(self.sum(request['start'], limit * duration))
+        response = self.proxyGetOhlcv(request)
         # {
         #     "status": "Success",
         #     "errorMessage": null,

@@ -56,6 +56,15 @@ module.exports = class capex extends Exchange {
                     ],
                 },
             },
+            a: ['1', '5', '15', '60', '240', '1440'],
+            'timeframes': {
+                '1m': '1',
+                '5m': '5',
+                '15m': '15',
+                '1h': '60',
+                '4h': '240',
+                '1d': '1440',
+            },
         });
     }
 
@@ -145,10 +154,22 @@ module.exports = class capex extends Exchange {
         const pairs = symbol.split ('/');
         const base = pairs[0];
         const quote = pairs[1];
-        const response = await this.proxyGetOhlcv ({
+        const request = {
             'base_currency': base,
             'quote_currency': quote,
-        });
+        };
+        if (since === undefined) {
+            request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            request['start'] = since;
+        }
+        if (limit === undefined) {
+            request['end'] = parseInt (this.milliseconds() / 1000);
+        } else {
+            const duration = this.parseTimeframe (timeframe);
+            request['end'] = parseInt (this.sum(request['start'], limit * duration));
+        }
+        const response = await this.proxyGetOhlcv (request);
         // {
         //     "status": "Success",
         //     "errorMessage": null,
