@@ -164,6 +164,7 @@ class xmeta(Exchange):
         id = symbol.replace('/', '_')
         request = {
             'symbol': id,
+            'interval': self.timeframes[timeframe],
         }
         if since is None:
             request['startTime'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)

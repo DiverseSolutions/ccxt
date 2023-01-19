@@ -165,6 +165,7 @@ module.exports = class xmeta extends Exchange {
         const id = symbol.replace ('/', '_');
         const request = {
             'symbol': id,
+            'interval': this.timeframes[timeframe],
         };
         if (since === undefined) {
             request['startTime'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);

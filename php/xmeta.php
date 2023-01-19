@@ -168,6 +168,7 @@ class xmeta extends Exchange {
         $id = str_replace('/', '_', $symbol);
         $request = array(
             'symbol' => $id,
+            'interval' => $this->timeframes[$timeframe],
         );
         if ($since === null) {
             $request['startTime'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
