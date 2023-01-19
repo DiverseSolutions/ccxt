@@ -71,6 +71,15 @@ class corex extends Exchange {
                     ),
                 ),
             ),
+            'timeframes' => array(
+                '1m' => '60',
+                '5m' => '300',
+                '15m' => '900',
+                '30m' => '1800',
+                '1h' => '3600',
+                '4h' => '14400',
+                '1d' => '86400',
+            ),
         ));
     }
 
@@ -221,9 +230,21 @@ class corex extends Exchange {
     public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
         $this->load_markets();
         $market = $this->market($symbol);
-        $response = $this->publicGetOhlcv (array(
+        $request = array(
             'market_id' => $market['id'],
-        ));
+        );
+        if ($since === null) {
+            $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            $request['start'] = $since;
+        }
+        if ($limit === null) {
+            $request['end'] = intval($this->milliseconds() / 1000);
+        } else {
+            $duration = $this->parse_timeframe($timeframe);
+            $request['end'] = intval($this->sum($request['start'], $limit * $duration));
+        }
+        $response = $this->publicGetOhlcv ($request);
         // array(
         //     array(
         //       1663257600,
