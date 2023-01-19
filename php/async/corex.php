@@ -232,17 +232,18 @@ class corex extends Exchange {
         $market = $this->market($symbol);
         $request = array(
             'market_id' => $market['id'],
+            'period' => $this->timeframes[$timeframe],
         );
         if ($since === null) {
-            $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+            $request['time_from'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
         } else {
-            $request['start'] = $since;
+            $request['time_from'] = $since;
         }
         if ($limit === null) {
-            $request['end'] = intval($this->milliseconds() / 1000);
+            $request['time_to'] = intval($this->milliseconds() / 1000);
         } else {
             $duration = $this->parse_timeframe($timeframe);
-            $request['end'] = intval($this->sum($request['start'], $limit * $duration));
+            $request['time_to'] = intval($this->sum($request['time_from'], $limit * $duration));
         }
         $response = yield $this->publicGetOhlcv ($request);
         // array(

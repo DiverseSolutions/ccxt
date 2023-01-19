@@ -229,17 +229,18 @@ module.exports = class corex extends Exchange {
         const market = this.market (symbol);
         const request = {
             'market_id': market['id'],
+            'period': this.timeframes[timeframe],
         };
         if (since === undefined) {
-            request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+            request['time_from'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
         } else {
-            request['start'] = since;
+            request['time_from'] = since;
         }
         if (limit === undefined) {
-            request['end'] = parseInt (this.milliseconds() / 1000);
+            request['time_to'] = parseInt (this.milliseconds() / 1000);
         } else {
             const duration = this.parseTimeframe (timeframe);
-            request['end'] = parseInt (this.sum(request['start'], limit * duration));
+            request['time_to'] = parseInt (this.sum(request['time_from'], limit * duration));
         }
         const response = await this.publicGetOhlcv (request);
         // [

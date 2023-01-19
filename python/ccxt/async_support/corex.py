@@ -225,16 +225,17 @@ class corex(Exchange):
         market = self.market(symbol)
         request = {
             'market_id': market['id'],
+            'period': self.timeframes[timeframe],
         }
         if since is None:
-            request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+            request['time_from'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
         else:
-            request['start'] = since
+            request['time_from'] = since
         if limit is None:
-            request['end'] = int(self.milliseconds() / 1000)
+            request['time_to'] = int(self.milliseconds() / 1000)
         else:
             duration = self.parse_timeframe(timeframe)
-            request['end'] = int(self.sum(request['start'], limit * duration))
+            request['time_to'] = int(self.sum(request['time_from'], limit * duration))
         response = await self.publicGetOhlcv(request)
         # [
         #     [
