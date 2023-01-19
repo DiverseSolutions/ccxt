@@ -129,10 +129,10 @@ class trademn extends Exchange {
     }
 
     public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
-        $request = {
+        $request = array(
             'symbol' => $symbol,
             'interval' => $this->timeframes[$timeframe],
-        }
+        );
         if ($since === null) {
             $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
         } else {

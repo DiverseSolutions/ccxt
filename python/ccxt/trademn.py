@@ -127,6 +127,7 @@ class trademn(Exchange):
         request = {
             'symbol': symbol,
             'interval': self.timeframes[timeframe],
+        }
         if since is None:
             request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
         else:

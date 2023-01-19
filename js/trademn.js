@@ -130,7 +130,7 @@ module.exports = class trademn extends Exchange {
         const request = {
             'symbol': symbol,
             'interval': this.timeframes[timeframe],
-        }
+        };
         if (since === undefined) {
             request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
         } else {
