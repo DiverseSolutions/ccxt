@@ -63,6 +63,18 @@ class xmeta extends Exchange {
                     ),
                 ),
             ),
+            'timeframes' => array(
+                '1m' => '1m',
+                '5m' => '5m',
+                '15m' => '15m',
+                '30m' => '30m',
+                '1h' => '1h',
+                '2h' => '2h',
+                '4h' => '4h',
+                '6h' => '6h',
+                '12h' => '12h',
+                '1d' => '1d',
+            ),
         ));
     }
 
@@ -154,9 +166,21 @@ class xmeta extends Exchange {
 
     public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
         $id = str_replace('/', '_', $symbol);
-        $response = $this->proxyGetOhlcv (array(
+        $request = array(
             'symbol' => $id,
-        ));
+        );
+        if ($since === null) {
+            $request['startTime'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            $request['startTime'] = $since;
+        }
+        if ($limit === null) {
+            $request['endTime'] = intval($this->milliseconds() / 1000);
+        } else {
+            $duration = $this->parse_timeframe($timeframe);
+            $request['endTime'] = intval($this->sum($request['startTime'], $limit * $duration));
+        }
+        $response = $this->proxyGetOhlcv ($request);
         // {
         //     "code" => 0,
         //     "msg" => "Success",

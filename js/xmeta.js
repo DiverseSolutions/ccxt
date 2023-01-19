@@ -60,6 +60,18 @@ module.exports = class xmeta extends Exchange {
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '1m',
+                '5m': '5m',
+                '15m': '15m',
+                '30m': '30m',
+                '1h': '1h',
+                '2h': '2h',
+                '4h': '4h',
+                '6h': '6h',
+                '12h': '12h',
+                '1d': '1d',
+            },
         });
     }
 
@@ -151,9 +163,21 @@ module.exports = class xmeta extends Exchange {
 
     async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
         const id = symbol.replace ('/', '_');
-        const response = await this.proxyGetOhlcv ({
+        const request = {
             'symbol': id,
-        });
+        };
+        if (since === undefined) {
+            request['startTime'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            request['startTime'] = since;
+        }
+        if (limit === undefined) {
+            request['endTime'] = parseInt (this.milliseconds() / 1000);
+        } else {
+            const duration = this.parseTimeframe (timeframe);
+            request['endTime'] = parseInt (this.sum(request['startTime'], limit * duration));
+        }
+        const response = await this.proxyGetOhlcv (request);
         // {
         //     "code": 0,
         //     "msg": "Success",

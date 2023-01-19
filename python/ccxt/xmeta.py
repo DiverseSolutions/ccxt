@@ -62,6 +62,18 @@ class xmeta(Exchange):
                     ],
                 },
             },
+            'timeframes': {
+                '1m': '1m',
+                '5m': '5m',
+                '15m': '15m',
+                '30m': '30m',
+                '1h': '1h',
+                '2h': '2h',
+                '4h': '4h',
+                '6h': '6h',
+                '12h': '12h',
+                '1d': '1d',
+            },
         })
 
     def fetch_tickers(self, symbols=None, params={}):
@@ -150,9 +162,19 @@ class xmeta(Exchange):
 
     def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
         id = symbol.replace('/', '_')
-        response = self.proxyGetOhlcv({
+        request = {
             'symbol': id,
-        })
+        }
+        if since is None:
+            request['startTime'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+        else:
+            request['startTime'] = since
+        if limit is None:
+            request['endTime'] = int(self.milliseconds() / 1000)
+        else:
+            duration = self.parse_timeframe(timeframe)
+            request['endTime'] = int(self.sum(request['startTime'], limit * duration))
+        response = self.proxyGetOhlcv(request)
         # {
         #     "code": 0,
         #     "msg": "Success",
