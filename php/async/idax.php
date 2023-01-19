@@ -68,7 +68,7 @@ class idax extends Exchange {
                 '30m' => '30min',
                 '1h' => '60min',
                 '2h' => null,
-                '4h' => null,
+                '4h' => '4h',
                 '6h' => null,
                 '8h' => null,
                 '12h' => null,
@@ -357,11 +357,11 @@ class idax extends Exchange {
     public function parse_ohlcv($ohlcv, $market = null) {
         $r = array();
         $r[] = intval($ohlcv['id']);
-        $r[] = $ohlcv['open'];
-        $r[] = $ohlcv['high'];
-        $r[] = $ohlcv['low'];
-        $r[] = $ohlcv['close'];
-        $r[] = $ohlcv['vol'];
+        $r[] = floatval($ohlcv['open']);
+        $r[] = floatval($ohlcv['high']);
+        $r[] = floatval($ohlcv['low']);
+        $r[] = floatval($ohlcv['close']);
+        $r[] = floatval($ohlcv['vol']);
         return $r;
     }
 

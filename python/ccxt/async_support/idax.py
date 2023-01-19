@@ -67,7 +67,7 @@ class idax(Exchange):
                 '30m': '30min',
                 '1h': '60min',
                 '2h': None,
-                '4h': None,
+                '4h': '4h',
                 '6h': None,
                 '8h': None,
                 '12h': None,
@@ -341,11 +341,11 @@ class idax(Exchange):
     def parse_ohlcv(self, ohlcv, market=None):
         r = []
         r.append(int(ohlcv['id']))
-        r.append(ohlcv['open'])
-        r.append(ohlcv['high'])
-        r.append(ohlcv['low'])
-        r.append(ohlcv['close'])
-        r.append(ohlcv['vol'])
+        r.append(float(ohlcv['open']))
+        r.append(float(ohlcv['high']))
+        r.append(float(ohlcv['low']))
+        r.append(float(ohlcv['close']))
+        r.append(float(ohlcv['vol']))
         return r
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):

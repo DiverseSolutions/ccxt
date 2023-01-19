@@ -354,11 +354,11 @@ module.exports = class idax extends Exchange {
     parseOHLCV (ohlcv, market = undefined) {
         const r = [];
         r.push (parseInt (ohlcv['id']));
-        r.push (ohlcv['open']);
-        r.push (ohlcv['high']);
-        r.push (ohlcv['low']);
-        r.push (ohlcv['close']);
-        r.push (ohlcv['vol']);
+        r.push (parseFloat (ohlcv['open']));
+        r.push (parseFloat (ohlcv['high']));
+        r.push (parseFloat (ohlcv['low']));
+        r.push (parseFloat (ohlcv['close']));
+        r.push (parseFloat (ohlcv['vol']));
         return r;
     }
 
