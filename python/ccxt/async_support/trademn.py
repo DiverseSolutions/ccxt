@@ -45,7 +45,7 @@ class trademn(Exchange):
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
                     'public': 'https://trade.mn:116/api/v2',
-                    'proxy': 'https://service-api.krypto.mn/exchange-proxy',
+                    'proxy': 'https://service-api.krypto.mn/exchange-proxy/trademn',
                 },
                 'www': 'https://trade.mn',
                 'doc': 'https://trade.mn',
@@ -53,15 +53,24 @@ class trademn(Exchange):
             'api': {
                 'proxy': {
                     'get': [
-                        'trademn/tickers',
-                        'trademn/ohlcv',
+                        'tickers',
+                        'ohlcv',
                     ],
                 },
+            },
+            'timeframes': {
+                '5m': '5',
+                '15m': '15',
+                '30m': '30',
+                '1h': '60',
+                '4h': '240',
+                '8h': '480',
+                '1d': '1440',
             },
         })
 
     async def fetch_tickers(self, symbols=None, params={}):
-        response = await self.proxyGetTrademnTickers(params)
+        response = await self.proxyGetTickers(params)
         # {
         #     "data": {
         #         "DOT/MNT": {
@@ -115,29 +124,30 @@ class trademn(Exchange):
         }
 
     async def fetch_ohlcv(self, symbol, timeframe='1d', since=None, limit=None, params={}):
-        response = await self.proxyGetTrademnOhlcv({
+        request = {
             'symbol': symbol,
-        })
-        # {
-        #     "status": True,
-        #     "code": "0000",
-        #     "msg": [
-        #       "Амжилттай"
-        #     ],
-        #     "data": {
-        #       "nextPage": -1,
-        #       "chartData": [
-        #         {
-        #           "time": 1629216000000,
-        #           "open": 1.5,
-        #           "high": 55,
-        #           "low": 1.5,
-        #           "close": 6.18,
-        #           "volume": 633596693.0555251
-        #         },
-        #     ]
-        # }
-        return self.parse_ohlcvs(response['data']['chartData'], symbol, timeframe, since, limit)
+            'interval': self.timeframes[timeframe],
+        if since is None:
+            request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
+        else:
+            request['start'] = since
+        if limit is None:
+            request['end'] = int(self.milliseconds() / 1000)
+        else:
+            duration = self.parse_timeframe(timeframe)
+            request['end'] = int(self.sum(request['start'], limit * duration))
+        response = await self.proxyGetOhlcv(request)
+        # [
+        #     {
+        #         "time": 1673951700000,
+        #         "open": 0.167,
+        #         "high": 0.167,
+        #         "low": 0.167,
+        #         "close": 0.167,
+        #         "volume": 1000
+        #     }
+        # ]
+        return self.parse_ohlcvs(response, symbol, timeframe, since, limit)
 
     def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
         result = []

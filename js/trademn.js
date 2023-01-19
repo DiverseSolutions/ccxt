@@ -44,7 +44,7 @@ module.exports = class trademn extends Exchange {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api': {
                     'public': 'https://trade.mn:116/api/v2',
-                    'proxy': 'https://service-api.krypto.mn/exchange-proxy',
+                    'proxy': 'https://service-api.krypto.mn/exchange-proxy/trademn',
                 },
                 'www': 'https://trade.mn',
                 'doc': 'https://trade.mn',
@@ -52,16 +52,25 @@ module.exports = class trademn extends Exchange {
             'api': {
                 'proxy': {
                     'get': [
-                        'trademn/tickers',
-                        'trademn/ohlcv',
+                        'tickers',
+                        'ohlcv',
                     ],
                 },
+            },
+            'timeframes': {
+                '5m': '5',
+                '15m': '15',
+                '30m': '30',
+                '1h': '60',
+                '4h': '240',
+                '8h': '480',
+                '1d': '1440',
             },
         });
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
-        const response = await this.proxyGetTrademnTickers (params);
+        const response = await this.proxyGetTickers (params);
         // {
         //     "data": {
         //         "DOT/MNT": {
@@ -118,29 +127,33 @@ module.exports = class trademn extends Exchange {
     }
 
     async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
-        const response = await this.proxyGetTrademnOhlcv ({
+        const request = {
             'symbol': symbol,
-        });
-        // {
-        //     "status": true,
-        //     "code": "0000",
-        //     "msg": [
-        //       "Амжилттай"
-        //     ],
-        //     "data": {
-        //       "nextPage": -1,
-        //       "chartData": [
-        //         {
-        //           "time": 1629216000000,
-        //           "open": 1.5,
-        //           "high": 55,
-        //           "low": 1.5,
-        //           "close": 6.18,
-        //           "volume": 633596693.0555251
-        //         },
-        //     ]
-        // }
-        return this.parseOHLCVs (response['data']['chartData'], symbol, timeframe, since, limit);
+            'interval': this.timeframes[timeframe],
+        }
+        if (since === undefined) {
+            request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            request['start'] = since;
+        }
+        if (limit === undefined) {
+            request['end'] = parseInt (this.milliseconds() / 1000);
+        } else {
+            const duration = this.parseTimeframe (timeframe);
+            request['end'] = parseInt (this.sum(request['start'], limit * duration));
+        }
+        const response = await this.proxyGetOhlcv (request);
+        // [
+        //     {
+        //         "time": 1673951700000,
+        //         "open": 0.167,
+        //         "high": 0.167,
+        //         "low": 0.167,
+        //         "close": 0.167,
+        //         "volume": 1000
+        //     }
+        // ]
+        return this.parseOHLCVs (response, symbol, timeframe, since, limit);
     }
 
     parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {

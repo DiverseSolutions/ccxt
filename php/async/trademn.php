@@ -46,7 +46,7 @@ class trademn extends Exchange {
                 'logo' => 'https://user-images.githubusercontent.com/1294454/67288762-2f04a600-f4e6-11e9-9fd6-c60641919491.jpg',
                 'api' => array(
                     'public' => 'https://trade.mn:116/api/v2',
-                    'proxy' => 'https://service-api.krypto.mn/exchange-proxy',
+                    'proxy' => 'https://service-api.krypto.mn/exchange-proxy/trademn',
                 ),
                 'www' => 'https://trade.mn',
                 'doc' => 'https://trade.mn',
@@ -54,16 +54,25 @@ class trademn extends Exchange {
             'api' => array(
                 'proxy' => array(
                     'get' => array(
-                        'trademn/tickers',
-                        'trademn/ohlcv',
+                        'tickers',
+                        'ohlcv',
                     ),
                 ),
+            ),
+            'timeframes' => array(
+                '5m' => '5',
+                '15m' => '15',
+                '30m' => '30',
+                '1h' => '60',
+                '4h' => '240',
+                '8h' => '480',
+                '1d' => '1440',
             ),
         ));
     }
 
     public function fetch_tickers($symbols = null, $params = array ()) {
-        $response = yield $this->proxyGetTrademnTickers ($params);
+        $response = yield $this->proxyGetTickers ($params);
         // {
         //     "data" => {
         //         "DOT/MNT" => array(
@@ -120,29 +129,33 @@ class trademn extends Exchange {
     }
 
     public function fetch_ohlcv($symbol, $timeframe = '1d', $since = null, $limit = null, $params = array ()) {
-        $response = yield $this->proxyGetTrademnOhlcv (array(
+        $request = {
             'symbol' => $symbol,
-        ));
-        // {
-        //     "status" => true,
-        //     "code" => "0000",
-        //     "msg" => array(
-        //       "Амжилттай"
-        //     ),
-        //     "data" => {
-        //       "nextPage" => -1,
-        //       "chartData" => array(
-        //         array(
-        //           "time" => 1629216000000,
-        //           "open" => 1.5,
-        //           "high" => 55,
-        //           "low" => 1.5,
-        //           "close" => 6.18,
-        //           "volume" => 633596693.0555251
-        //         ),
-        //     )
-        // }
-        return $this->parse_ohlcvs($response['data']['chartData'], $symbol, $timeframe, $since, $limit);
+            'interval' => $this->timeframes[$timeframe],
+        }
+        if ($since === null) {
+            $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+        } else {
+            $request['start'] = $since;
+        }
+        if ($limit === null) {
+            $request['end'] = intval($this->milliseconds() / 1000);
+        } else {
+            $duration = $this->parse_timeframe($timeframe);
+            $request['end'] = intval($this->sum($request['start'], $limit * $duration));
+        }
+        $response = yield $this->proxyGetOhlcv ($request);
+        // array(
+        //     {
+        //         "time" => 1673951700000,
+        //         "open" => 0.167,
+        //         "high" => 0.167,
+        //         "low" => 0.167,
+        //         "close" => 0.167,
+        //         "volume" => 1000
+        //     }
+        // )
+        return $this->parse_ohlcvs($response, $symbol, $timeframe, $since, $limit);
     }
 
     public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
