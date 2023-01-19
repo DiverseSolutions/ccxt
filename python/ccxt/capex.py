@@ -157,11 +157,11 @@ class capex(Exchange):
             'quote_currency': quote,
         }
         if since is None:
-            request['start'] = int(self.milliseconds() - 48 * 60 * 60 * 1000)
+            request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
         else:
             request['start'] = since
         if limit is None:
-            request['end'] = int(self.milliseconds())
+            request['end'] = int(self.milliseconds() / 1000)
         else:
             duration = self.parse_timeframe(timeframe)
             request['end'] = int(self.sum(request['start'], limit * duration))
