@@ -158,12 +158,12 @@ module.exports = class capex extends Exchange {
             'quote_currency': quote,
         };
         if (since === undefined) {
-            request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
+            request['start'] = parseInt (this.milliseconds() - 48 * 60 * 60 * 1000);
         } else {
             request['start'] = since;
         }
         if (limit === undefined) {
-            request['end'] = parseInt (this.milliseconds() / 1000);
+            request['end'] = parseInt (this.milliseconds());
         } else {
             const duration = this.parseTimeframe (timeframe);
             request['end'] = parseInt (this.sum(request['start'], limit * duration));

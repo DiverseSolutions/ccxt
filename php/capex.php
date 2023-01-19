@@ -161,12 +161,12 @@ class capex extends Exchange {
             'quote_currency' => $quote,
         );
         if ($since === null) {
-            $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
+            $request['start'] = intval($this->milliseconds() - 48 * 60 * 60 * 1000);
         } else {
             $request['start'] = $since;
         }
         if ($limit === null) {
-            $request['end'] = intval($this->milliseconds() / 1000);
+            $request['end'] = intval($this->milliseconds());
         } else {
             $duration = $this->parse_timeframe($timeframe);
             $request['end'] = intval($this->sum($request['start'], $limit * $duration));
