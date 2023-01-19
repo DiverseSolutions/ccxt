@@ -208,6 +208,11 @@ class xmeta(Exchange):
 
     def parse_ohlcv(self, ohlcv, market=None):
         ohlcv[0] = int(ohlcv[0])
+        ohlcv[1] = int(ohlcv[1])
+        ohlcv[2] = int(ohlcv[2])
+        ohlcv[3] = int(ohlcv[3])
+        ohlcv[4] = int(ohlcv[4])
+        ohlcv[5] = int(ohlcv[5])
         return ohlcv[0:6] if isinstance(ohlcv, list) else ohlcv
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
