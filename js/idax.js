@@ -65,7 +65,7 @@ module.exports = class idax extends Exchange {
                 '30m': '30min',
                 '1h': '60min',
                 '2h': undefined,
-                '4h': undefined,
+                '4h': '4h',
                 '6h': undefined,
                 '8h': undefined,
                 '12h': undefined,
