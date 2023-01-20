@@ -203,11 +203,10 @@ class complex(Exchange):
         base = pairs[0].upper()
         quote = pairs[1].upper()
         id = base + '-' + quote
-        request = {}
-        response = self.publicGetOhlcv({
+        request = {
             'market': id,
             'resolution': self.timeframes[timeframe]
-        })
+        }
         if since is None:
             request['from'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
         else:
@@ -217,6 +216,7 @@ class complex(Exchange):
         else:
             duration = self.parse_timeframe(timeframe)
             request['to'] = int(self.sum(request['from'], limit * duration))
+        response = self.publicGetOhlcv(request)
         # {
         #     "s": "ok",
         #     "errmsg": null,

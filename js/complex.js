@@ -206,11 +206,10 @@ module.exports = class complex extends Exchange {
         const base = pairs[0].toUpperCase ();
         const quote = pairs[1].toUpperCase ();
         const id = base + '-' + quote;
-        const request = {};
-        const response = await this.publicGetOhlcv ({
+        const request = {
             'market': id,
             'resolution': this.timeframes[timeframe]
-        });
+        };
         if (since === undefined) {
             request['from'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
         } else {
@@ -222,6 +221,7 @@ module.exports = class complex extends Exchange {
             const duration = this.parseTimeframe (timeframe);
             request['to'] = parseInt (this.sum(request['from'], limit * duration));
         }
+        const response = await this.publicGetOhlcv (request);
         // {
         //     "s": "ok",
         //     "errmsg": null,

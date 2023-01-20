@@ -209,11 +209,10 @@ class complex extends Exchange {
         $base = strtoupper($pairs[0]);
         $quote = strtoupper($pairs[1]);
         $id = $base . '-' . $quote;
-        $request = array();
-        $response = yield $this->publicGetOhlcv (array(
+        $request = array(
             'market' => $id,
             'resolution' => $this->timeframes[$timeframe]
-        ));
+        );
         if ($since === null) {
             $request['from'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
         } else {
@@ -225,6 +224,7 @@ class complex extends Exchange {
             $duration = $this->parse_timeframe($timeframe);
             $request['to'] = intval($this->sum($request['from'], $limit * $duration));
         }
+        $response = yield $this->publicGetOhlcv ($request);
         // {
         //     "s" => "ok",
         //     "errmsg" => null,
