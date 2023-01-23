@@ -356,7 +356,7 @@ class idax extends Exchange {
 
     public function parse_ohlcv($ohlcv, $market = null) {
         $r = array();
-        $r[] = intval($ohlcv['id']);
+        $r[] = intval($ohlcv['id']) * 1000;
         $r[] = floatval($ohlcv['open']);
         $r[] = floatval($ohlcv['high']);
         $r[] = floatval($ohlcv['low']);

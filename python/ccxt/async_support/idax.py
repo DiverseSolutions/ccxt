@@ -340,7 +340,7 @@ class idax(Exchange):
 
     def parse_ohlcv(self, ohlcv, market=None):
         r = []
-        r.append(int(ohlcv['id']))
+        r.append(int(ohlcv['id']) * 1000)
         r.append(float(ohlcv['open']))
         r.append(float(ohlcv['high']))
         r.append(float(ohlcv['low']))
