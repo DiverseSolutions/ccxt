@@ -164,7 +164,7 @@ class capex extends Exchange {
         if ($since === null) {
             $request['start'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
         } else {
-            $request['start'] = $since;
+            $request['start'] = intval($since / 1000);
         }
         if ($limit === null) {
             $request['end'] = intval($this->milliseconds() / 1000);

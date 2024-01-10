@@ -160,7 +160,7 @@ class capex(Exchange):
         if since is None:
             request['start'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
         else:
-            request['start'] = since
+            request['start'] = int(since / 1000)
         if limit is None:
             request['end'] = int(self.milliseconds() / 1000)
         else:
