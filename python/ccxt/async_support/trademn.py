@@ -160,11 +160,11 @@ class trademn(Exchange):
     def parse_ohlcv(self, ohlcv, market=None):
         r = []
         r.append(int(ohlcv['time']))
-        r.append(ohlcv['open'])
-        r.append(ohlcv['high'])
-        r.append(ohlcv['low'])
-        r.append(ohlcv['close'])
-        r.append(ohlcv['volume'])
+        r.append(float(ohlcv['open']))
+        r.append(float(ohlcv['high']))
+        r.append(float(ohlcv['low']))
+        r.append(float(ohlcv['close']))
+        r.append(float(ohlcv['volume']))
         return r
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):

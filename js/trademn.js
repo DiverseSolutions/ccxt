@@ -168,11 +168,11 @@ module.exports = class trademn extends Exchange {
     parseOHLCV (ohlcv, market = undefined) {
         const r = [];
         r.push (parseInt (ohlcv['time']));
-        r.push (ohlcv['open']);
-        r.push (ohlcv['high']);
-        r.push (ohlcv['low']);
-        r.push (ohlcv['close']);
-        r.push (ohlcv['volume']);
+        r.push (parseFloat (ohlcv['open']));
+        r.push (parseFloat (ohlcv['high']));
+        r.push (parseFloat (ohlcv['low']));
+        r.push (parseFloat (ohlcv['close']));
+        r.push (parseFloat (ohlcv['volume']));
         return r;
     }
 

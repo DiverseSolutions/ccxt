@@ -170,11 +170,11 @@ class trademn extends Exchange {
     public function parse_ohlcv($ohlcv, $market = null) {
         $r = array();
         $r[] = intval($ohlcv['time']);
-        $r[] = $ohlcv['open'];
-        $r[] = $ohlcv['high'];
-        $r[] = $ohlcv['low'];
-        $r[] = $ohlcv['close'];
-        $r[] = $ohlcv['volume'];
+        $r[] = floatval($ohlcv['open']);
+        $r[] = floatval($ohlcv['high']);
+        $r[] = floatval($ohlcv['low']);
+        $r[] = floatval($ohlcv['close']);
+        $r[] = floatval($ohlcv['volume']);
         return $r;
     }
 
