@@ -237,7 +237,7 @@ module.exports = class corex extends Exchange {
         if (since === undefined) {
             request['time_from'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
         } else {
-            request['time_from'] = since;
+            request['time_from'] = parseInt (since / 1000);
         }
         if (limit === undefined) {
             request['time_to'] = parseInt (this.milliseconds() / 1000);

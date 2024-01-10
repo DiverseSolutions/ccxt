@@ -233,7 +233,7 @@ class corex(Exchange):
         if since is None:
             request['time_from'] = int(self.milliseconds() / 1000 - 48 * 60 * 60)
         else:
-            request['time_from'] = since
+            request['time_from'] = int(since / 1000)
         if limit is None:
             request['time_to'] = int(self.milliseconds() / 1000)
         else:

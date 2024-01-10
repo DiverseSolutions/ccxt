@@ -240,7 +240,7 @@ class corex extends Exchange {
         if ($since === null) {
             $request['time_from'] = intval($this->milliseconds() / 1000 - 48 * 60 * 60);
         } else {
-            $request['time_from'] = $since;
+            $request['time_from'] = intval($since / 1000);
         }
         if ($limit === null) {
             $request['time_to'] = intval($this->milliseconds() / 1000);
