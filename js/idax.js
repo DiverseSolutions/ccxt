@@ -314,7 +314,7 @@ module.exports = class idax extends Exchange {
         if (since === undefined) {
             request['start'] = parseInt (this.milliseconds() / 1000 - 48 * 60 * 60);
         } else {
-            request['start'] = since;
+            request['start'] = parseInt (since / 1000);
         }
         if (limit === undefined) {
             request['end'] = parseInt (this.milliseconds() / 1000);
