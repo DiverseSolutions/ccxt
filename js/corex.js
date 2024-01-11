@@ -256,10 +256,10 @@ module.exports = class corex extends Exchange {
         //       5243.97705169
         //     ],
         // ]
-        return this.parseOHLCVs (response, symbol, timeframe, since, limit);
+        return this.parseOHLCVS (response, symbol, timeframe, since, limit);
     }
 
-    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCVS (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         const result = [];
         for (let i = 0; i < ohlcvs.length; i++) {
             const ohlcv = [

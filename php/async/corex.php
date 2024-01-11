@@ -262,7 +262,7 @@ class corex extends Exchange {
         return $this->parse_ohlcvs($response, $symbol, $timeframe, $since, $limit);
     }
 
-    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+    public function parse_ohlcvs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
         $result = array();
         for ($i = 0; $i < count($ohlcvs); $i++) {
             $ohlcv = [

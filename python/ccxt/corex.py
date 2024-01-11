@@ -252,7 +252,7 @@ class corex(Exchange):
         # ]
         return self.parse_ohlcvs(response, symbol, timeframe, since, limit)
 
-    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+    def parse_ohlcvs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
         result = []
         for i in range(0, len(ohlcvs)):
             ohlcv = [
