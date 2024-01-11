@@ -255,7 +255,15 @@ class corex(Exchange):
     def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
         result = []
         for i in range(0, len(ohlcvs)):
-            result.append(self.parse_ohlcv(ohlcvs[i], market))
+            ohlcv = [
+                ohlcvs[0],
+                ohlcvs[1],
+                ohlcvs[2],
+                ohlcvs[3],
+                ohlcvs[4],
+                ohlcvs[5],
+            ]
+            result.append(self.parse_ohlcv(ohlcv, market))
         sorted = self.sort_by(result, 0)
         return sorted
 

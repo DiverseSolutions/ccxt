@@ -265,7 +265,15 @@ class corex extends Exchange {
     public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
         $result = array();
         for ($i = 0; $i < count($ohlcvs); $i++) {
-            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
+            $ohlcv = [
+                $ohlcvs[0],
+                $ohlcvs[1],
+                $ohlcvs[2],
+                $ohlcvs[3],
+                $ohlcvs[4],
+                $ohlcvs[5],
+            ]
+            $result[] = $this->parse_ohlcv($ohlcv, $market);
         }
         $sorted = $this->sort_by($result, 0);
         return $sorted;

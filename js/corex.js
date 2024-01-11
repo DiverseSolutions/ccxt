@@ -262,7 +262,15 @@ module.exports = class corex extends Exchange {
     parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         const result = [];
         for (let i = 0; i < ohlcvs.length; i++) {
-            result.push (this.parseOHLCV (ohlcvs[i], market));
+            const ohlcv = [
+                ohlcvs[0],
+                ohlcvs[1],
+                ohlcvs[2],
+                ohlcvs[3],
+                ohlcvs[4],
+                ohlcvs[5],
+            ]
+            result.push (this.parseOHLCV (ohlcv, market));
         }
         const sorted = this.sortBy (result, 0);
         return sorted;
