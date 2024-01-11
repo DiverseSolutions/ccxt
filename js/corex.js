@@ -256,34 +256,27 @@ module.exports = class corex extends Exchange {
         //       5243.97705169
         //     ],
         // ]
-        return this.parseOHLCVS (response, symbol, timeframe, since, limit);
+        return this.parseOHLCVs (response, symbol, timeframe, since, limit);
     }
 
-    parseOHLCVS (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCVs (ohlcvs, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         const result = [];
         for (let i = 0; i < ohlcvs.length; i++) {
-            const ohlcv = [
-                ohlcvs[0],
-                ohlcvs[1],
-                ohlcvs[2],
-                ohlcvs[3],
-                ohlcvs[4],
-                ohlcvs[5],
-            ]
-            result.push (this.parseOHLCV (ohlcv, market));
+            result.push (this.parseOHLCV (ohlcvs[i], market));
         }
         const sorted = this.sortBy (result, 0);
         return sorted;
     }
 
     parseOHLCV (ohlcv, market = undefined) {
-        ohlcv[0] = parseInt (ohlcv[0]) * 1000;
-        ohlcv[1] = parseFloat (ohlcv[1]);
-        ohlcv[2] = parseFloat (ohlcv[2]);
-        ohlcv[3] = parseFloat (ohlcv[3]);
-        ohlcv[4] = parseFloat (ohlcv[4]);
-        ohlcv[5] = parseFloat (ohlcv[5]);
-        return ohlcv;
+        const result = [0, 0, 0, 0, 0, 0];
+        result[0] = parseInt (ohlcv[0]) * 1000;
+        result[1] = parseFloat (ohlcv[1]);
+        result[2] = parseFloat (ohlcv[2]);
+        result[3] = parseFloat (ohlcv[3]);
+        result[4] = parseFloat (ohlcv[4]);
+        result[5] = parseFloat (ohlcv[5]);
+        return result;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {

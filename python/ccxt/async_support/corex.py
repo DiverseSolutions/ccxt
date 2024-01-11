@@ -252,29 +252,22 @@ class corex(Exchange):
         # ]
         return self.parse_ohlcvs(response, symbol, timeframe, since, limit)
 
-    def parse_ohlcvs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
+    def parse_ohlc_vs(self, ohlcvs, market=None, timeframe='1m', since=None, limit=None):
         result = []
         for i in range(0, len(ohlcvs)):
-            ohlcv = [
-                ohlcvs[0],
-                ohlcvs[1],
-                ohlcvs[2],
-                ohlcvs[3],
-                ohlcvs[4],
-                ohlcvs[5],
-            ]
-            result.append(self.parse_ohlcv(ohlcv, market))
+            result.append(self.parse_ohlcv(ohlcvs[i], market))
         sorted = self.sort_by(result, 0)
         return sorted
 
     def parse_ohlcv(self, ohlcv, market=None):
-        ohlcv[0] = int(ohlcv[0]) * 1000
-        ohlcv[1] = float(ohlcv[1])
-        ohlcv[2] = float(ohlcv[2])
-        ohlcv[3] = float(ohlcv[3])
-        ohlcv[4] = float(ohlcv[4])
-        ohlcv[5] = float(ohlcv[5])
-        return ohlcv
+        result = [0, 0, 0, 0, 0, 0]
+        result[0] = int(ohlcv[0]) * 1000
+        result[1] = float(ohlcv[1])
+        result[2] = float(ohlcv[2])
+        result[3] = float(ohlcv[3])
+        result[4] = float(ohlcv[4])
+        result[5] = float(ohlcv[5])
+        return result
 
     def sign(self, path, api='public', method='GET', params={}, headers=None, body=None):
         url = self.urls['api'][api]

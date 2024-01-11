@@ -262,31 +262,24 @@ class corex extends Exchange {
         return $this->parse_ohlcvs($response, $symbol, $timeframe, $since, $limit);
     }
 
-    public function parse_ohlcvs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
+    public function parse_ohlc_vs($ohlcvs, $market = null, $timeframe = '1m', $since = null, $limit = null) {
         $result = array();
         for ($i = 0; $i < count($ohlcvs); $i++) {
-            $ohlcv = [
-                $ohlcvs[0],
-                $ohlcvs[1],
-                $ohlcvs[2],
-                $ohlcvs[3],
-                $ohlcvs[4],
-                $ohlcvs[5],
-            ]
-            $result[] = $this->parse_ohlcv($ohlcv, $market);
+            $result[] = $this->parse_ohlcv($ohlcvs[$i], $market);
         }
         $sorted = $this->sort_by($result, 0);
         return $sorted;
     }
 
     public function parse_ohlcv($ohlcv, $market = null) {
-        $ohlcv[0] = intval($ohlcv[0]) * 1000;
-        $ohlcv[1] = floatval($ohlcv[1]);
-        $ohlcv[2] = floatval($ohlcv[2]);
-        $ohlcv[3] = floatval($ohlcv[3]);
-        $ohlcv[4] = floatval($ohlcv[4]);
-        $ohlcv[5] = floatval($ohlcv[5]);
-        return $ohlcv;
+        $result = [0, 0, 0, 0, 0, 0];
+        $result[0] = intval($ohlcv[0]) * 1000;
+        $result[1] = floatval($ohlcv[1]);
+        $result[2] = floatval($ohlcv[2]);
+        $result[3] = floatval($ohlcv[3]);
+        $result[4] = floatval($ohlcv[4]);
+        $result[5] = floatval($ohlcv[5]);
+        return $result;
     }
 
     public function sign($path, $api = 'public', $method = 'GET', $params = array (), $headers = null, $body = null) {
