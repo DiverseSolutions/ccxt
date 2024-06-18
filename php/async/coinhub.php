@@ -16,7 +16,7 @@ class coinhub extends Exchange {
             'id' => 'coinhub',
             'name' => 'coinhub',
             'countries' => ['MN'],
-            'rateLimit' => 500,
+            'rateLimit' => 1000,
             'requiresWeb3' => false,
             'certified' => false,
             // new metainfo interface
@@ -171,10 +171,27 @@ class coinhub extends Exchange {
         //         }
         //     ),
         // }
-        return $this->parse_tickers($response, $symbols);
+        $tickers = array();
+        $marketKeys = is_array($this->markets) ? array_keys($this->markets) : array();
+        for ($i = 0; $i < count($marketKeys); $i++) {
+            $marketKey = $marketKeys[$i];
+            $market = $this->markets[$marketKey];
+            $ticker = $response[$market['id']]['ticker'];
+            $baseId = $ticker['base_unit'];
+            $quoteId = $ticker['quote_unit'];
+            $base = strtoupper($baseId);
+            $quote = strtoupper($quoteId);
+            $symbol = $base . "/" . $quote;
+            $id = $base . $quote;
+            $ticker['symbol'] = $symbol;
+            $ticker['id'] = $id;
+            $ticker['timestamp'] = $response[$market['id']]['at'] * 1000;
+            $tickers[] = $ticker)
+        }
+        return $this->parse_tickers($tickers, $symbols;
     }
 
-    public function parse_ticker($tickerEntry, $market = null) {
+    public function parse_ticker($ticker, $market = null) {
         // {
         //     "at" => 1718588758,
         //     "ticker" => {
@@ -194,12 +211,10 @@ class coinhub extends Exchange {
         //       "quote_unit" => "mnt"
         //     }
         //   }
-        $ticker = $tickerEntry['ticker']
-        $timestamp = $this->safe_integer($tickerEntry, 'at');
-        $marketId = $this->array_concat([$ticker['base_unit']], [$ticker['quote_unit']]);
-        $symbol = $this->safe_symbol($marketId, $market);
-        // if (is_array($this->markets_by_id) && array_key_exists($marketId, $this->markets_by_id)) {
-        //     $market = $this->markets_by_id[$marketId];
+        $timestamp = $this->safe_integer($ticker, 'timestamp');
+        $symbol = $ticker['symbol'];
+        // if (is_array($this->markets_by_id) && array_key_exists(marketId, $this->markets_by_id)) {
+        //     $market = $this->markets_by_id[marketId];
         // } else {
         //     $baseId = $this->safe_string($ticker, 'base');
         //     $quoteId = $this->safe_string($ticker, 'quote');

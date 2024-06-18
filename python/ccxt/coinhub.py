@@ -15,7 +15,7 @@ class coinhub(Exchange):
             'id': 'coinhub',
             'name': 'coinhub',
             'countries': ['MN'],
-            'rateLimit': 500,
+            'rateLimit': 1000,
             'requiresWeb3': False,
             'certified': False,
             # new metainfo interface
@@ -165,9 +165,25 @@ class coinhub(Exchange):
         #         }
         #     },
         # }
-        return self.parse_tickers(response, symbols)
+        tickers = []
+        marketKeys = list(self.markets.keys())
+        for i in range(0, len(marketKeys)):
+            marketKey = marketKeys[i]
+            market = self.markets[marketKey]
+            ticker = response[market['id']]['ticker']
+            baseId = ticker['base_unit']
+            quoteId = ticker['quote_unit']
+            base = baseId.upper()
+            quote = quoteId.upper()
+            symbol = base + "/" + quote
+            id = base + quote
+            ticker['symbol'] = symbol
+            ticker['id'] = id
+            ticker['timestamp'] = response[market['id']]['at'] * 1000
+            tickers.append(ticker)
+        return self.parse_tickers(tickers, symbols)
 
-    def parse_ticker(self, tickerEntry, market=None):
+    def parse_ticker(self, ticker, market=None):
         # {
         #     "at": 1718588758,
         #     "ticker": {
@@ -187,10 +203,8 @@ class coinhub(Exchange):
         #       "quote_unit": "mnt"
         #     }
         #   }
-        ticker = tickerEntry['ticker']
-        timestamp = self.safe_integer(tickerEntry, 'at')
-        marketId = self.array_concat([ticker['base_unit']], [ticker['quote_unit']])
-        symbol = self.safe_symbol(marketId, market)
+        timestamp = self.safe_integer(ticker, 'timestamp')
+        symbol = ticker['symbol']
         # if marketId in self.markets_by_id:
         #     market = self.markets_by_id[marketId]
         # else:

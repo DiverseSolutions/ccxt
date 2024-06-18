@@ -13,7 +13,7 @@ module.exports = class coinhub extends Exchange {
             'id': 'coinhub',
             'name': 'coinhub',
             'countries': ['MN'],
-            'rateLimit': 500,
+            'rateLimit': 1000,
             'requiresWeb3': false,
             'certified': false,
             // new metainfo interface
@@ -168,10 +168,27 @@ module.exports = class coinhub extends Exchange {
         //         }
         //     },
         // }
-        return this.parseTickers (response, symbols);
+        const tickers = [];
+        const marketKeys = Object.keys (this.markets);
+        for (let i = 0; i < marketKeys.length; i++) {
+            const marketKey = marketKeys[i];
+            const market = this.markets[marketKey];
+            const ticker = response[market['id']]['ticker'];
+            const baseId = ticker['base_unit'];
+            const quoteId = ticker['quote_unit'];
+            const base = baseId.toUpperCase ();
+            const quote = quoteId.toUpperCase ();
+            const symbol = base + "/" + quote;
+            const id = base + quote;
+            ticker['symbol'] = symbol;
+            ticker['id'] = id;
+            ticker['timestamp'] = response[market['id']]['at'] * 1000;
+            tickers.push (ticker)
+        }
+        return this.parseTickers (tickers, symbols);
     }
 
-    parseTicker (tickerEntry, market = undefined) {
+    parseTicker (ticker, market = undefined) {
         // {
         //     "at": 1718588758,
         //     "ticker": {
@@ -191,10 +208,8 @@ module.exports = class coinhub extends Exchange {
         //       "quote_unit": "mnt"
         //     }
         //   }
-        const ticker = tickerEntry['ticker']
-        const timestamp = this.safeInteger (tickerEntry, 'at');
-        const marketId = this.arrayConcat ([ticker['base_unit']], [ticker['quote_unit']]);
-        const symbol = this.safeSymbol (marketId, market);
+        const timestamp = this.safeInteger (ticker, 'timestamp');
+        const symbol = ticker['symbol'];
         // if (marketId in this.markets_by_id) {
         //     market = this.markets_by_id[marketId];
         // } else {
