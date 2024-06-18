@@ -83,16 +83,16 @@ class coinhub extends Exchange {
 
     public function fetch_markets($params = array ()) {
         $response = yield $this->publicGetTickers ($params);
-        $markets = $response['data'];
+        $markets = $response;
         $result = array();
         $keys = is_array($markets) ? array_keys($markets) : array();
         for ($i = 0; $i < count($keys); $i++) {
-            $market = $markets[$keys[$i]];
-            $id = $this->safe_string($market, 'market');
-            $base = $this->safe_string($market, explode(strtoupper('/', 'market'))[0]);
-            $quote = $this->safe_string($market, explode(strtoupper('/', 'market'))[1]);
-            $baseId = $base;
-            $quoteId = $quote;
+            $market = $markets[$keys[$i]]['ticker'];
+            $id = $keys[$i];
+            $base = strtoupper($this->safe_string($market, 'base_unit'));
+            $quote = strtoupper($this->safe_string($market, 'quote_unit'));
+            $baseId = $this->safe_string($market, 'base_unit');
+            $quoteId = $this->safe_string($market, 'quote_unit');
             if (is_array($this->commonCurrencies) && array_key_exists($baseId, $this->commonCurrencies)) {
                 $base = $this->commonCurrencies[$baseId];
             }
@@ -151,42 +151,52 @@ class coinhub extends Exchange {
         yield $this->load_markets();
         $response = yield $this->publicGetTickers ($params);
         // {
-        //     "code" => 200,
-        //     "message" => "success",
-        //     "data" => {
-        //         "IHC/MNT" => array(
-        //             "volume" => 1595147755.9,
-        //             "high" => 3.23997,
-        //             "deal" => 5117109795.941351,
-        //             "close" => 3.224,
-        //             "low" => 3.13,
-        //             "open" => 3.16003,
-        //             "change" => 0.0202,
-        //             "timestamp" => 1641522240004,
-        //             "market" => "IHC/MNT"
-        //         ),
+        //     "usdtmnt" => {
+        //         "at" => 1718588758,
+        //         "ticker" => array(
+        //         "buy" => "3436.0",
+        //         "sell" => "3440.0",
+        //         "low" => "3423.8",
+        //         "high" => "3450.0",
+        //         "open" => 3425,
+        //         "last" => "3436.0",
+        //         "volume" => "56497.0",
+        //         "avg_price" => "3441.075476927978476733277873161",
+        //         "price_change_percent" => "+0.32%",
+        //         "total_volume" => "194410441.22",
+        //         "total_volume_base_currency" => "56762.17261897810218978102189781",
+        //         "vol" => "56497.0",
+        //         "base_unit" => "usdt",
+        //         "quote_unit" => "mnt"
+        //         }
+        //     ),
         // }
-        return $this->parse_tickers($response['data'], $symbols);
+        return $this->parse_tickers($response, $symbols);
     }
 
-    public function parse_ticker($ticker, $market = null) {
-        $timestamp = $this->safe_integer($ticker, 'timestamp');
+    public function parse_ticker($tickerEntry, $market = null) {
         // {
-        //     "data" => {
-        //         "IHC/MNT" => {
-        //             "volume" => 1595147755.9,
-        //             "high" => 3.23997,
-        //             "deal" => 5117109795.941351,
-        //             "close" => 3.224,
-        //             "low" => 3.13,
-        //             "open" => 3.16003,
-        //             "change" => 0.0202,
-        //             "timestamp" => 1641522240004,
-        //             "market" => "IHC/MNT"
-        //         }
+        //     "at" => 1718588758,
+        //     "ticker" => {
+        //       "buy" => "3436.0",
+        //       "sell" => "3440.0",
+        //       "low" => "3423.8",
+        //       "high" => "3450.0",
+        //       "open" => 3425,
+        //       "last" => "3436.0",
+        //       "volume" => "56497.0",
+        //       "avg_price" => "3441.075476927978476733277873161",
+        //       "price_change_percent" => "+0.32%",
+        //       "total_volume" => "194410441.22",
+        //       "total_volume_base_currency" => "56762.17261897810218978102189781",
+        //       "vol" => "56497.0",
+        //       "base_unit" => "usdt",
+        //       "quote_unit" => "mnt"
         //     }
-        // }
-        $marketId = $this->safe_string($ticker, 'market');
+        //   }
+        $ticker = $tickerEntry['ticker']
+        $timestamp = $this->safe_integer($tickerEntry, 'at');
+        $marketId = $this->array_concat([$ticker['base_unit']], [$ticker['quote_unit']]);
         $symbol = $this->safe_symbol($marketId, $market);
         // if (is_array($this->markets_by_id) && array_key_exists($marketId, $this->markets_by_id)) {
         //     $market = $this->markets_by_id[$marketId];
@@ -208,19 +218,19 @@ class coinhub extends Exchange {
             'datetime' => $this->iso8601($timestamp),
             'high' => $this->safe_number($ticker, 'high'),
             'low' => $this->safe_number($ticker, 'low'),
-            'bid' => null,
+            'bid' => $this->safe_number($ticker, 'buy'),
             'bidVolume' => null,
-            'ask' => null,
+            'ask' => $this->safe_number($ticker, 'sell'),
             'askVolume' => null,
             'vwap' => null,
             'open' => $this->safe_number($ticker, 'open'),
-            'close' => $this->safe_number($ticker, 'close'),
-            'last' => $this->safe_number($ticker, 'close'),
+            'close' => $this->safe_number($ticker, 'last'),
+            'last' => $this->safe_number($ticker, 'last'),
             'previousClose' => null,
             'change' => null,
             'percentage' => null,
             'average' => null,
-            'baseVolume' => $this->safe_number($ticker, 'volume'),
+            'baseVolume' => $this->safe_number($ticker, 'vol'),
             'quoteVolume' => null,
             'info' => $ticker,
         );

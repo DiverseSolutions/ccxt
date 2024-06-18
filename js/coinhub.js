@@ -80,16 +80,16 @@ module.exports = class coinhub extends Exchange {
 
     async fetchMarkets (params = {}) {
         const response = await this.publicGetTickers (params);
-        const markets = response['data'];
+        const markets = response;
         const result = [];
         const keys = Object.keys (markets);
         for (let i = 0; i < keys.length; i++) {
-            const market = markets[keys[i]];
-            const id = this.safeString (market, 'market');
-            let base = this.safeString (market, 'market').split ('/')[0].toUpperCase ();
-            let quote = this.safeString (market, 'market').split ('/')[1].toUpperCase ();
-            const baseId = base;
-            const quoteId = quote;
+            const market = markets[keys[i]]['ticker'];
+            const id = keys[i];
+            let base = this.safeString (market, 'base_unit').toUpperCase ();
+            let quote = this.safeString (market, 'quote_unit').toUpperCase ();
+            const baseId = this.safeString (market, 'base_unit');
+            const quoteId = this.safeString (market, 'quote_unit');
             if (baseId in this.commonCurrencies) {
                 base = this.commonCurrencies[baseId];
             }
@@ -148,42 +148,52 @@ module.exports = class coinhub extends Exchange {
         await this.loadMarkets ();
         const response = await this.publicGetTickers (params);
         // {
-        //     "code": 200,
-        //     "message": "success",
-        //     "data": {
-        //         "IHC/MNT": {
-        //             "volume": 1595147755.9,
-        //             "high": 3.23997,
-        //             "deal": 5117109795.941351,
-        //             "close": 3.224,
-        //             "low": 3.13,
-        //             "open": 3.16003,
-        //             "change": 0.0202,
-        //             "timestamp": 1641522240004,
-        //             "market": "IHC/MNT"
-        //         },
+        //     "usdtmnt": {
+        //         "at": 1718588758,
+        //         "ticker": {
+        //         "buy": "3436.0",
+        //         "sell": "3440.0",
+        //         "low": "3423.8",
+        //         "high": "3450.0",
+        //         "open": 3425,
+        //         "last": "3436.0",
+        //         "volume": "56497.0",
+        //         "avg_price": "3441.075476927978476733277873161",
+        //         "price_change_percent": "+0.32%",
+        //         "total_volume": "194410441.22",
+        //         "total_volume_base_currency": "56762.17261897810218978102189781",
+        //         "vol": "56497.0",
+        //         "base_unit": "usdt",
+        //         "quote_unit": "mnt"
+        //         }
+        //     },
         // }
-        return this.parseTickers (response['data'], symbols);
+        return this.parseTickers (response, symbols);
     }
 
-    parseTicker (ticker, market = undefined) {
-        const timestamp = this.safeInteger (ticker, 'timestamp');
+    parseTicker (tickerEntry, market = undefined) {
         // {
-        //     "data": {
-        //         "IHC/MNT": {
-        //             "volume": 1595147755.9,
-        //             "high": 3.23997,
-        //             "deal": 5117109795.941351,
-        //             "close": 3.224,
-        //             "low": 3.13,
-        //             "open": 3.16003,
-        //             "change": 0.0202,
-        //             "timestamp": 1641522240004,
-        //             "market": "IHC/MNT"
-        //         }
+        //     "at": 1718588758,
+        //     "ticker": {
+        //       "buy": "3436.0",
+        //       "sell": "3440.0",
+        //       "low": "3423.8",
+        //       "high": "3450.0",
+        //       "open": 3425,
+        //       "last": "3436.0",
+        //       "volume": "56497.0",
+        //       "avg_price": "3441.075476927978476733277873161",
+        //       "price_change_percent": "+0.32%",
+        //       "total_volume": "194410441.22",
+        //       "total_volume_base_currency": "56762.17261897810218978102189781",
+        //       "vol": "56497.0",
+        //       "base_unit": "usdt",
+        //       "quote_unit": "mnt"
         //     }
-        // }
-        const marketId = this.safeString (ticker, 'market');
+        //   }
+        const ticker = tickerEntry['ticker']
+        const timestamp = this.safeInteger (tickerEntry, 'at');
+        const marketId = this.arrayConcat ([ticker['base_unit']], [ticker['quote_unit']]);
         const symbol = this.safeSymbol (marketId, market);
         // if (marketId in this.markets_by_id) {
         //     market = this.markets_by_id[marketId];
@@ -205,19 +215,19 @@ module.exports = class coinhub extends Exchange {
             'datetime': this.iso8601 (timestamp),
             'high': this.safeNumber (ticker, 'high'),
             'low': this.safeNumber (ticker, 'low'),
-            'bid': undefined,
+            'bid': this.safeNumber (ticker, 'buy'),
             'bidVolume': undefined,
-            'ask': undefined,
+            'ask': this.safeNumber (ticker, 'sell'),
             'askVolume': undefined,
             'vwap': undefined,
             'open': this.safeNumber (ticker, 'open'),
-            'close': this.safeNumber (ticker, 'close'),
-            'last': this.safeNumber (ticker, 'close'),
+            'close': this.safeNumber (ticker, 'last'),
+            'last': this.safeNumber (ticker, 'last'),
             'previousClose': undefined,
             'change': undefined,
             'percentage': undefined,
             'average': undefined,
-            'baseVolume': this.safeNumber (ticker, 'volume'),
+            'baseVolume': this.safeNumber (ticker, 'vol'),
             'quoteVolume': undefined,
             'info': ticker,
         };

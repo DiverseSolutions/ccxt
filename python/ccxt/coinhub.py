@@ -81,16 +81,16 @@ class coinhub(Exchange):
 
     def fetch_markets(self, params={}):
         response = self.publicGetTickers(params)
-        markets = response['data']
+        markets = response
         result = []
         keys = list(markets.keys())
         for i in range(0, len(keys)):
-            market = markets[keys[i]]
-            id = self.safe_string(market, 'market')
-            base = self.safe_string(market, 'market').split('/')[0].upper()
-            quote = self.safe_string(market, 'market').split('/')[1].upper()
-            baseId = base
-            quoteId = quote
+            market = markets[keys[i]]['ticker']
+            id = keys[i]
+            base = self.safe_string(market, 'base_unit').upper()
+            quote = self.safe_string(market, 'quote_unit').upper()
+            baseId = self.safe_string(market, 'base_unit')
+            quoteId = self.safe_string(market, 'quote_unit')
             if baseId in self.commonCurrencies:
                 base = self.commonCurrencies[baseId]
             if quoteId in self.commonCurrencies:
@@ -145,41 +145,51 @@ class coinhub(Exchange):
         self.load_markets()
         response = self.publicGetTickers(params)
         # {
-        #     "code": 200,
-        #     "message": "success",
-        #     "data": {
-        #         "IHC/MNT": {
-        #             "volume": 1595147755.9,
-        #             "high": 3.23997,
-        #             "deal": 5117109795.941351,
-        #             "close": 3.224,
-        #             "low": 3.13,
-        #             "open": 3.16003,
-        #             "change": 0.0202,
-        #             "timestamp": 1641522240004,
-        #             "market": "IHC/MNT"
-        #         },
-        # }
-        return self.parse_tickers(response['data'], symbols)
-
-    def parse_ticker(self, ticker, market=None):
-        timestamp = self.safe_integer(ticker, 'timestamp')
-        # {
-        #     "data": {
-        #         "IHC/MNT": {
-        #             "volume": 1595147755.9,
-        #             "high": 3.23997,
-        #             "deal": 5117109795.941351,
-        #             "close": 3.224,
-        #             "low": 3.13,
-        #             "open": 3.16003,
-        #             "change": 0.0202,
-        #             "timestamp": 1641522240004,
-        #             "market": "IHC/MNT"
+        #     "usdtmnt": {
+        #         "at": 1718588758,
+        #         "ticker": {
+        #         "buy": "3436.0",
+        #         "sell": "3440.0",
+        #         "low": "3423.8",
+        #         "high": "3450.0",
+        #         "open": 3425,
+        #         "last": "3436.0",
+        #         "volume": "56497.0",
+        #         "avg_price": "3441.075476927978476733277873161",
+        #         "price_change_percent": "+0.32%",
+        #         "total_volume": "194410441.22",
+        #         "total_volume_base_currency": "56762.17261897810218978102189781",
+        #         "vol": "56497.0",
+        #         "base_unit": "usdt",
+        #         "quote_unit": "mnt"
         #         }
-        #     }
+        #     },
         # }
-        marketId = self.safe_string(ticker, 'market')
+        return self.parse_tickers(response, symbols)
+
+    def parse_ticker(self, tickerEntry, market=None):
+        # {
+        #     "at": 1718588758,
+        #     "ticker": {
+        #       "buy": "3436.0",
+        #       "sell": "3440.0",
+        #       "low": "3423.8",
+        #       "high": "3450.0",
+        #       "open": 3425,
+        #       "last": "3436.0",
+        #       "volume": "56497.0",
+        #       "avg_price": "3441.075476927978476733277873161",
+        #       "price_change_percent": "+0.32%",
+        #       "total_volume": "194410441.22",
+        #       "total_volume_base_currency": "56762.17261897810218978102189781",
+        #       "vol": "56497.0",
+        #       "base_unit": "usdt",
+        #       "quote_unit": "mnt"
+        #     }
+        #   }
+        ticker = tickerEntry['ticker']
+        timestamp = self.safe_integer(tickerEntry, 'at')
+        marketId = self.array_concat([ticker['base_unit']], [ticker['quote_unit']])
         symbol = self.safe_symbol(marketId, market)
         # if marketId in self.markets_by_id:
         #     market = self.markets_by_id[marketId]
@@ -201,19 +211,19 @@ class coinhub(Exchange):
             'datetime': self.iso8601(timestamp),
             'high': self.safe_number(ticker, 'high'),
             'low': self.safe_number(ticker, 'low'),
-            'bid': None,
+            'bid': self.safe_number(ticker, 'buy'),
             'bidVolume': None,
-            'ask': None,
+            'ask': self.safe_number(ticker, 'sell'),
             'askVolume': None,
             'vwap': None,
             'open': self.safe_number(ticker, 'open'),
-            'close': self.safe_number(ticker, 'close'),
-            'last': self.safe_number(ticker, 'close'),
+            'close': self.safe_number(ticker, 'last'),
+            'last': self.safe_number(ticker, 'last'),
             'previousClose': None,
             'change': None,
             'percentage': None,
             'average': None,
-            'baseVolume': self.safe_number(ticker, 'volume'),
+            'baseVolume': self.safe_number(ticker, 'vol'),
             'quoteVolume': None,
             'info': ticker,
         }
